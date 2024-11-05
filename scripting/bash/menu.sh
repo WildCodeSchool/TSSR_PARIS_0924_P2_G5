@@ -48,52 +48,13 @@ menu_gestion_utilisateur() {
     read -p "Choisissez une option: " choice
 
     case $choice in
-        1) menu_compte_utilisateur ;;
+        1) source Compte_Utilisateur.sh ;;
         2) menu_groupe_utilisateur ;;
         3) main_menu ;;
         *) echo "Choix invalide !" && menu_gestion_utilisateur ;;
     esac
 }
 
-# Sous-menu pour les actions sur les comptes utilisateurs
-clear
-menu_compte_utilisateur() {
-    echo "=== Compte Utilisateur ==="
-    echo "1. Création de compte utilisateur local"
-    echo "2. Changement de mot de passe"
-    echo "3. Suppression de compte utilisateur local"
-    echo "4. Désactivation de compte utilisateur local"
-    echo "5. Retour"
-    read -p "Choisissez une option: " choice
-
-    case $choice in
-        1) create_local_user ;;
-        2) change_password ;;
-        3) delete_local_user ;;
-        4) disable_local_user ;;
-        5) menu_gestion_utilisateur ;;
-        *) echo "Choix invalide !" && menu_compte_utilisateur ;;
-    esac
-}
-
-# Sous-menu pour la gestion des groupes
-menu_groupe_utilisateur() {
-    clear
-    echo "=== Gestion des Groupes ==="
-    echo "1. Ajout à un groupe d'administration"
-    echo "2. Ajout à un groupe local"
-    echo "3. Sortie d'un groupe local"
-    echo "4. Retour"
-    read -p "Choisissez une option: " choice
-
-    case $choice in
-        1) add_to_admin_group ;;
-        2) add_to_local_group ;;
-        3) remove_from_local_group ;;
-        4) menu_gestion_utilisateur ;;
-        *) echo "Choix invalide !" && menu_groupe_utilisateur ;;
-    esac
-}
 
 # Sous-menu pour la gestion des ordinateurs
 menu_gestion_ordinateur() {
