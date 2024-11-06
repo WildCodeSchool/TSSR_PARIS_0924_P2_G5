@@ -105,7 +105,7 @@ function Menu-Gestion-Ordinateur {
     switch ($choice) {
         1 { Power-Management-Menu }
         2 { Update-System }
-        3 { Manage-Directory }
+        3 { & "./Gestion_repertoire.ps1"}
         4 { Remote-Access-Menu }
         5 { Firewall-Management }
         6 { Software-Management }
