@@ -36,7 +36,7 @@ while ($true) {
     Read-Host "Appuyez sur [Entrée] pour revenir au menu principal..."
 }
 
-$filePath =  ".\groupelog.txt"
+$filePath =  ".\Mise_a_jour_du_systeme.txt"
 $date = Get-Date
 
 function Create-File {
