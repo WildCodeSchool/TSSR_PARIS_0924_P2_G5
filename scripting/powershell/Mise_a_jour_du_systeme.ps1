@@ -36,7 +36,8 @@ while ($true) {
     Read-Host "Appuyez sur [Entrée] pour revenir au menu principal..."
 }
 
-
+$filePath =  ".\groupelog.txt"
+$date = Get-Date
 
 function Create-File {
     param (
