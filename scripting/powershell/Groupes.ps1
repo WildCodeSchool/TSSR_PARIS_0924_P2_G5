@@ -1,5 +1,27 @@
 # --- Script avec Menu interactif pour gérer les utilisateurs et les groupes en PowerShell ---
 
+$filePath =  ".\groupelog.txt"
+$date = Get-Date
+
+# Fonction pour créer un fichier log
+function Create-File {
+    param (
+        [string]$filePath
+    )
+
+    if (-not (Test-Path -Path $filePath)) {
+        New-Item -ItemType File -Path $filePath -Force | Out-Null
+        Write-Output "Fichier '$filePath' créé avec succès."
+        # Ajout d'un message de création dans le fichier
+        Add-Content -Path $filePath -Value "$date - Fichier créé"
+    } else {
+        Write-Output "Le fichier '$filePath' existe déjà." > $null
+    }
+}
+
+
+
+
 while ($true) {
     # Affichage du menu
     Write-Host "=============================="
@@ -28,6 +50,7 @@ while ($true) {
                 # Création de l'utilisateur
                 New-LocalUser -Name $username -Password (ConvertTo-SecureString $password -AsPlainText -Force)
                 Write-Host "L'utilisateur $username a été créé."
+                Add-Content -Path $filePath -Value "$date - utilisateur $username à été créé."
             }
 
             # Ajouter l'utilisateur au groupe d'administration
@@ -35,6 +58,7 @@ while ($true) {
             if ($group) {
                 Add-LocalGroupMember -Group $admin_group -Member $username
                 Write-Host "L'utilisateur $username a été ajouté au groupe d'administration $admin_group."
+                Add-Content -Path $filePath -Value "$date - utilisateur $username a été ajouté au groupe d'administration $admin_group."
             } else {
                 Write-Host "Le groupe $admin_group n'existe pas. Veuillez vérifier."
             }
@@ -54,6 +78,8 @@ while ($true) {
                 # Création de l'utilisateur
                 New-LocalUser -Name $username -Password (ConvertTo-SecureString $password -AsPlainText -Force)
                 Write-Host "L'utilisateur $username a été créé."
+                Add-Content -Path $filePath -Value "$date - utilisateur $username a été créé."
+
             }
 
             # Ajouter l'utilisateur au groupe local
@@ -61,6 +87,7 @@ while ($true) {
             if ($groupObj) {
                 Add-LocalGroupMember -Group $group -Member $username
                 Write-Host "L'utilisateur $username a été ajouté au groupe local $group."
+                Add-Content -Path $filePath -Value "$date - utilisateur $username a été ajouté au groupe d'administration $admin_group."
             } else {
                 Write-Host "Le groupe $group n'existe pas. Veuillez vérifier."
             }
@@ -89,6 +116,7 @@ while ($true) {
             if ($groupMembers.Name -contains $username) {
                 Remove-LocalGroupMember -Group $group -Member $username
                 Write-Host "L'utilisateur $username a été retiré du groupe $group."
+                Add-Content -Path $filePath -Value "$date - utilisateur $username a été retiré du groupe $group."
             } else {
                 Write-Host "L'utilisateur $username n'est pas membre du groupe $group."
             }

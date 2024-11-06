@@ -36,6 +36,25 @@ while ($true) {
     Read-Host "Appuyez sur [Entrée] pour revenir au menu principal..."
 }
 
+
+
+function Create-File {
+    param (
+        [string]$filePath
+    )
+
+    if (-not (Test-Path -Path $filePath)) {
+        New-Item -ItemType File -Path $filePath -Force | Out-Null
+        Write-Output "Fichier '$filePath' créé avec succès."
+        # Ajout d'un message de création dans le fichier
+        Add-Content -Path $filePath -Value "$date - Fichier créé"
+    } else {
+        Write-Output "Le fichier '$filePath' existe déjà." > $null
+    }
+}
+
+
+
 function Update-System {
     try {
         # Vérification de la version du système (Windows ou Windows Server)
@@ -68,7 +87,9 @@ function Update-System {
         }
 
         Write-Host "Mise à jour terminée avec succès !"
+        Add-Content -Path $filePath -Value "$date - mise à jour terminée avec succès."
     } catch {
         Write-Host "Une erreur s'est produite lors de la mise à jour : $_"
+        Add-Content -Path $filePath -Value "$date - une erreur s'est produite lors de la mise à jour."
     }
 }

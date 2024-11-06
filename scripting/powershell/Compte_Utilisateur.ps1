@@ -20,6 +20,26 @@ function Show-MainMenu {
     }
 }
 
+$filePath =  ".\Compte_utilisateur.txt"
+$date = Get-Date
+
+# Fonction pour créer un fichier log
+function Create-File {
+    param (
+        [string]$filePath
+    )
+
+    if (-not (Test-Path -Path $filePath)) {
+        New-Item -ItemType File -Path $filePath -Force | Out-Null
+        Write-Output "Fichier '$filePath' créé avec succès."
+        # Ajout d'un message de création dans le fichier
+        Add-Content -Path $filePath -Value "$date - Fichier créé"
+    } else {
+        Write-Output "Le fichier '$filePath' existe déjà." > $null
+    }
+}
+
+
 # Fonction pour créer un compte utilisateur
 function Create-UserAccount {
     Clear-Host
@@ -35,8 +55,10 @@ function Create-UserAccount {
         
         if (Get-LocalUser -Name $newUser) {
             Write-Host "Utilisateur $newUser créé !"
+            Add-Content -Path $filePath -Value "$date - utilisateur $newUser créé"
         } else {
             Write-Host "Erreur : Utilisateur $newUser non créé."
+            Add-Content -Path $filePath -Value "$date - erreur $newUser non créé"
         }
     }
     Read-Host "Appuyez sur Entrée pour revenir au menu principal..."
@@ -69,6 +91,7 @@ function Change-UserPassword {
     $username = Read-Host "Entrez le nom d'utilisateur pour modifier le mot de passe"
     Set-LocalUser -Name $username -Password $mdp
     Write-Host "Modification du mot de passe avec succès."
+    Add-Content -Path $filePath -Value "$date - mot de passe de $username modifié"
     Read-Host "Appuyez sur Entrée pour revenir au menu principal..."
     Show-MainMenu
 }
@@ -85,8 +108,10 @@ function Remove-UserAccount {
         
         if (-not (Get-LocalUser -Name $delUser -ErrorAction SilentlyContinue)) {
             Write-Host "Utilisateur $delUser supprimé."
+            Add-Content -Path $filePath -Value "$date - Utilisateur $delUser supprimé"
         } else {
             Write-Host "! Erreur : Utilisateur $delUser non supprimé."
+            Add-Content -Path $filePath -Value "$date - erreur $delUser non supprimé"
         }
     } else {
         Write-Host "Utilisateur $delUser non existant."
@@ -109,8 +134,10 @@ function Disable-UserAccount {
         
         if (-not (Get-LocalUser -Name $userToDisable -ErrorAction SilentlyContinue).Enabled) {
             Write-Host "Utilisateur $userToDisable désactivé."
+            Add-Content -Path $filePath -Value "$date - utilisateur $userToDisable désactivé"
         } else {
             Write-Host "! Erreur : Utilisateur $userToDisable non désactivé."
+            Add-Content -Path $filePath -Value "$date - Erreur utilisateur $userToDisable non désactivé."
         }
     } else {
         Write-Host "Utilisateur $userToDisable non existant."
