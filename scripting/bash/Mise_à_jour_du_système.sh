@@ -1,5 +1,28 @@
 #!/bin/bash
 
+# Chemin du fichier log
+
+filePath="./Mise_à_jour_du_systemelog.txt"
+# Date actuelle
+date=$(date)
+
+# Fonction pour créer un fichier log
+create_file() {
+    # Vérifie si le fichier existe
+    if [ ! -f "$filePath" ]; then
+        # Crée le fichier
+        touch "$filePath"
+        echo "Fichier '$filePath' créé avec succès."
+        # Ajoute un message de création avec la date dans le fichier
+        echo "$date - Fichier créé" >> "$filePath"
+    else
+        echo "Le fichier '$filePath' existe déjà." > /dev/null
+    fi
+}
+
+# Appel de la fonction
+create_file
+
 # --- Script de gestion de la mise à jour pour Ubuntu/Debian ---
 
 while true; do
@@ -19,6 +42,7 @@ while true; do
                 echo "Mise à jour du système en cours sur Debian/Ubuntu..."
                 sudo apt update -y && sudo apt upgrade -y
                 echo "Mise à jour terminée avec succès !"
+                echo " $date - Mise à jour terminée avec succes" >> $filePath
             else
                 echo "Ce script est uniquement conçu pour les systèmes Debian/Ubuntu."
             fi

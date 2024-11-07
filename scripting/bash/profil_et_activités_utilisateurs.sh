@@ -1,9 +1,33 @@
 #!/bin/bash
 
+# Chemin du fichier log
+
+filePath="./profil_et_activites_utilisateurlog.txt"
+# Date actuelle
+date=$(date)
+
+# Fonction pour créer un fichier log
+create_file() {
+    # Vérifie si le fichier existe
+    if [ ! -f "$filePath" ]; then
+        # Crée le fichier
+        touch "$filePath"
+        echo "Fichier '$filePath' créé avec succès."
+        # Ajoute un message de création avec la date dans le fichier
+        echo "$date - Fichier créé" >> "$filePath"
+    else
+        echo "Le fichier '$filePath' existe déjà." > /dev/null
+    fi
+}
+
+# Appel de la fonction
+create_file
+
 # Fonction pour afficher Groupe d'appartenace d'un utilisateur
 groupe_appartenance_utilisateur(){
  #ssh $nomssh@$adresseip
     groups 
+    echo " $date - succes demande appartenance au groupe" >> $filePath
     exit 0
 }
 
@@ -11,7 +35,7 @@ groupe_appartenance_utilisateur(){
 historique_commande_utilisateur(){
      #ssh $nomssh@$adresseip
    history
-
+echo " $date - succes demande historique de commandes" >> $filePath
 }
 
 

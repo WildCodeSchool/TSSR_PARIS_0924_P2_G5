@@ -49,7 +49,7 @@ menu_gestion_utilisateur() {
 
     case $choice in
         1) source Compte_Utilisateur.sh ;;
-        2) menu_groupe_utilisateur ;;
+        2) source Groupes.sh ;;
         3) main_menu ;;
         *) echo "Choix invalide !" && menu_gestion_utilisateur ;;
     esac
@@ -70,8 +70,8 @@ menu_gestion_ordinateur() {
     read -p "Choisissez une option: " choice
 
     case $choice in
-        1) power_management_menu ;;
-        2) update_system ;;
+        1) source commande_d'alimentation.sh ;;
+        2) source Mise_à_jour_du_système.sh ;;
         3) source gestion_repertoire.sh ;;
         4) remote_access_menu ;;
         5) source gestion_du_pare_feu.sh ;;

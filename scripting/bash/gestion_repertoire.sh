@@ -1,5 +1,27 @@
 #!/bin/bash
 
+filePath="./gestion_repertoire.txt"
+# Date actuelle
+date=$(date)
+
+# Fonction pour créer un fichier log
+create_file() {
+    # Vérifie si le fichier existe
+    if [ ! -f "$filePath" ]; then
+        # Crée le fichier
+        touch "$filePath"
+        echo "Fichier '$filePath' créé avec succès."
+        # Ajoute un message de création avec la date dans le fichier
+        echo "$date - Fichier créé" >> "$filePath"
+        
+    else
+        echo "Le fichier '$filePath' existe déjà." > /dev/null
+    fi
+}
+
+# Appel de la fonction
+create_file
+
 # Fonction pour créer un répertoire
 function create {
      #ssh $nomssh@$adresseip
@@ -10,6 +32,7 @@ function create {
         if [ ! -e "$nom" ]; then
             mkdir "$nom"
             echo "Le dossier est créé."
+            echo " $date - Le dossier $nom est créé " >> $filePath
         exit 0
         else 
             echo "Ce dossier existe déjà."
@@ -34,6 +57,7 @@ function modified {
                 if [ ! -e "$newname" ]; then
                     mv "$nomrep" "$newname"
                     echo "Le nom a été modifié."
+                     echo " $date - Le dossier $nomrep a été renommé $newname " >> $filePath
                 
                 else
                     echo "Ce dossier existe déjà."
@@ -51,6 +75,7 @@ function delete {
         if [ -e "$repsup" ]; then
             rm -r "$repsup"
             echo "Le répertoire a été supprimé."
+             echo " $date - Le dossier $repsup a été supprimé " >> $filePath
             break
         else
             echo "Ce dossier n'existe pas."

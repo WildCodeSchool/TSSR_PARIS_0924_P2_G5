@@ -1,18 +1,43 @@
 #!/bin/bash
 
+filePath="./etat_systeme_ressourcelog.txt"
+# Date actuelle
+date=$(date)
+
+# Fonction pour créer un fichier log
+create_file() {
+    # Vérifie si le fichier existe
+    if [ ! -f "$filePath" ]; then
+        # Crée le fichier
+        touch "$filePath"
+        echo "Fichier '$filePath' créé avec succès."
+        # Ajoute un message de création avec la date dans le fichier
+        echo "$date - Fichier créé" >> "$filePath"
+        
+    else
+        echo "Le fichier '$filePath' existe déjà." > /dev/null
+    fi
+}
+
+# Appel de la fonction
+create_file
+
 # Liste des applications/paquets installés
 function Application_installees() {
     dpkg --get-selections
+    echo " $date - Liste des applications/paquets installés " >> $filePath
 }
 
 # Liste des services en cours d'exécution
 function Service_en_execution() {
     systemctl list-units --type=service --state=running
+    echo " $date - Liste des services en cours d'exécution " >> $filePath
 }
 
 # Liste des utilisateurs locaux
 function Utilisateur_locaux() {
     cut -d: -f1 /etc/passwd
+    echo " $date - Liste des utilisateurs locaux " >> $filePath
 }
 
 # Boucle du menu principal

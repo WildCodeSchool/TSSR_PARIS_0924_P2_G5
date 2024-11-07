@@ -1,9 +1,33 @@
 #!/bin/bash
 
+# Chemin du fichier log
+
+filePath="./information_ramlog.txt"
+# Date actuelle
+date=$(date)
+
+# Fonction pour créer un fichier log
+create_file() {
+    # Vérifie si le fichier existe
+    if [ ! -f "$filePath" ]; then
+        # Crée le fichier
+        touch "$filePath"
+        echo "Fichier '$filePath' créé avec succès."
+        # Ajoute un message de création avec la date dans le fichier
+        echo "$date - Fichier créé" >> "$filePath"
+    else
+        echo "Le fichier '$filePath' existe déjà." > /dev/null
+    fi
+}
+
+# Appel de la fonction
+create_file
+
 # Fonction pour afficher la date de la dernière connexion de l'utilisateur
 connexion_utilisateur(){
      #ssh $nomssh@$adresseip
     last -n 1
+    echo " $date - information date de la derniere connexion de l'utilisateur" >> $filePath
     exit 0
 }
 
@@ -13,6 +37,7 @@ motDePasse_utilisateur(){
     read -p "Nom de l'utilisateur: " nom
     if id "$nom" &>/dev/null; then
         chage -l wilder | grep "Dernière modification du mot de passe"
+        echo " $date - information derniere modification du mot de passe de l'utilisateur" >> $filePath
         exit 0
     else
         echo "Utilisateur introuvable."
@@ -23,6 +48,7 @@ motDePasse_utilisateur(){
 session_ouverte_utilisateur(){
      #ssh $nomssh@$adresseip
     who
+    echo " $date - information sur les session ouverte par les utilisateur" >> $filePath
     exit 0
 }
 

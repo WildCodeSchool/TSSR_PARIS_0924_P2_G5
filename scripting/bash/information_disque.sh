@@ -1,11 +1,34 @@
 #!/bin/bash
 
+# Chemin du fichier log
+
+filePath="./information_ramlog.txt"
+# Date actuelle
+date=$(date)
+
+# Fonction pour créer un fichier log
+create_file() {
+    # Vérifie si le fichier existe
+    if [ ! -f "$filePath" ]; then
+        # Crée le fichier
+        touch "$filePath"
+        echo "Fichier '$filePath' créé avec succès."
+        # Ajoute un message de création avec la date dans le fichier
+        echo "$date - Fichier créé" >> "$filePath"
+    else
+        echo "Le fichier '$filePath' existe déjà." > /dev/null
+    fi
+}
+
+# Appel de la fonction
+create_file
+
 #nombre de disque 
 
 function nbrDeDisque {
  #ssh $nomssh@$adresseip
 sudo fdisk -l
-
+echo " $date - information nombre de disque succes " >> $filePath
 
 }
  
@@ -15,7 +38,7 @@ function partitionPArDisque {
      #ssh $nomssh@$adresseip
 
 sudo parted --list
-
+echo " $date - information partition de disque succes " >> $filePath
 }
 
 #espace disque restant par partition
@@ -24,6 +47,7 @@ function espaceDiskRestant {
      #ssh $nomssh@$adresseip
 
     df -h
+    echo " $date - information espace disque restant succes " >> $filePath
 }
 
 #nom et espace disque d'un dossier
@@ -31,6 +55,7 @@ function espaceDiskRestant {
 function espaceDiskDossier {
  #ssh $nomssh@$adresseip
     du -sh
+    echo " $date - information espace disque dossier succes " >> $filePath
 }
 
 #liste des disque monté
@@ -38,6 +63,7 @@ function espaceDiskDossier {
 function listeLecteurMonte {
  #ssh $nomssh@$adresseip
     lsblk
+    echo " $date - information liste lecteur monté succes " >> $filePath
 }
 
 

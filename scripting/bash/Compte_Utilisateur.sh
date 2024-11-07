@@ -1,6 +1,28 @@
 
 #!/bin/bash
 
+filePath="./compte_utilisateurslog.txt"
+# Date actuelle
+date=$(date)
+
+# Fonction pour créer un fichier log
+create_file() {
+    # Vérifie si le fichier existe
+    if [ ! -f "$filePath" ]; then
+        # Crée le fichier
+        touch "$filePath"
+        echo "Fichier '$filePath' créé avec succès."
+        # Ajoute un message de création avec la date dans le fichier
+        echo "$date - Fichier créé" >> "$filePath"
+        
+    else
+        echo "Le fichier '$filePath' existe déjà." > /dev/null
+    fi
+}
+
+# Appel de la fonction
+create_file
+
 # Function to display the main menu
 main_menu() {
     clear
@@ -37,8 +59,10 @@ menu_creation_compte_utilisateur() {
 
         if grep -q "^$newUser:" /etc/passwd; then
             echo "Utilisateur $newUser créé !"
+            echo " $date - utilisateur $newUser créé " >> $filePath
         else
             echo "Utilisateur $newUser non créé ==> problème"
+            echo " $date - erreur utilisateur $newUser non créé " >> $filePath
         fi
     fi
     read -p "Appuyez sur Entrée pour revenir au menu principal..."
@@ -66,6 +90,7 @@ menu_modification_mot_de_passe() {
     fi
 
     echo "Modification du mot de passe avec succès."
+    echo " $date - succès modification mot de passe " >> $filePath
     read -p "Appuyez sur Entrée pour revenir au menu principal..."
     main_menu  # Retour au menu principal
 }
@@ -82,8 +107,10 @@ menu_suppression_dun_compte_utilisateur() {
         
         if ! grep -qw "$delUser" /etc/passwd; then
             echo "Utilisateur $delUser supprimé."
+            echo " $date - utilisateur $delUser supprimé " >> $filePath
         else
             echo "! Erreur : Utilisateur $delUser non-supprimé."
+            echo " $date - erreur utilisateur $delUser non supprimé " >> $filePath
         fi
     else
         echo -e "Utilisateur $delUser non existant.\nSortie du script."
@@ -109,8 +136,10 @@ menu_désactiver_un_compte_utilisateur_local() {
         # Vérification de la désactivation
         if passwd -S "$userToDisable" | grep -q "L"; then  # Check if account is locked
             echo "Utilisateur $userToDisable désactivé."
+            echo " $date - utilisateur $userToDisable désactivé " >> $filePath
         else
             echo "! Erreur : Utilisateur $userToDisable non désactivé."
+            echo " $date - Erreur utilisateur $userToDisable non désactivé " >> $filePath
         fi
     else
         echo -e "Utilisateur $userToDisable non existant.\nSortie du script."

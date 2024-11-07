@@ -1,5 +1,28 @@
 #!/bin/bash
 
+# Chemin du fichier log
+
+filePath="./information_ramlog.txt"
+# Date actuelle
+date=$(date)
+
+# Fonction pour créer un fichier log
+create_file() {
+    # Vérifie si le fichier existe
+    if [ ! -f "$filePath" ]; then
+        # Crée le fichier
+        touch "$filePath"
+        echo "Fichier '$filePath' créé avec succès."
+        # Ajoute un message de création avec la date dans le fichier
+        echo "$date - Fichier créé" >> "$filePath"
+    else
+        echo "Le fichier '$filePath' existe déjà." > /dev/null
+    fi
+}
+
+# Appel de la fonction
+create_file
+
 # --- Script avec Menu interactif pour gérer les utilisateurs et les groupes ---
 
 while true; do
@@ -28,6 +51,7 @@ while true; do
             if getent group "$admin_group" &>/dev/null; then
                 usermod -aG "$admin_group" "$username"
                 echo "L'utilisateur $username a été ajouté au groupe $admin_group."
+                echo " $date - L'utilisateur $username a été ajouté au groupe $admin_group" >> $filePath
             else
                 echo "Le groupe $admin_group n'existe pas. Veuillez vérifier."
             fi
@@ -45,6 +69,7 @@ while true; do
             if getent group "$group" &>/dev/null; then
                 usermod -aG "$group" "$username"
                 echo "L'utilisateur $username a été ajouté au groupe local $group."
+                echo " $date - L'utilisateur $username a été ajouté au groupe local $group" >> $filePath
             else
                 echo "Le groupe $group n'existe pas. Veuillez vérifier."
             fi
@@ -76,6 +101,7 @@ while true; do
             # Retirer l'utilisateur du groupe
             gpasswd -d "$username" "$group"
             echo "L'utilisateur $username a été retiré du groupe $group."
+            echo " $date - L'utilisateur $username a été retiré du groupe $group" >> $filePath
             ;;
         
         4)

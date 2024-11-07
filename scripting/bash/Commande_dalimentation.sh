@@ -2,6 +2,27 @@
 
 # --- Script de gestion des commandes d'alimentation ---
 
+filePath="./Commande_alimentationlog.txt"
+# Date actuelle
+date=$(date)
+
+# Fonction pour créer un fichier log
+create_file() {
+    # Vérifie si le fichier existe
+    if [ ! -f "$filePath" ]; then
+        # Crée le fichier
+        touch "$filePath"
+        echo "Fichier '$filePath' créé avec succès."
+        # Ajoute un message de création avec la date dans le fichier
+        echo "$date - Fichier créé" >> "$filePath"
+    else
+        echo "Le fichier '$filePath' existe déjà." > /dev/null
+    fi
+}
+
+# Appel de la fonction
+create_file
+
 while true; do
     # Affichage du menu
     echo "=============================="
@@ -19,6 +40,7 @@ while true; do
             # Arrêter l'ordinateur
             echo "Arrêt en cours..."
             sudo shutdown now
+             echo " $date - arret de l'ordinateur " >> $filePath
             break
             ;;
         
@@ -26,6 +48,7 @@ while true; do
             # Redémarrer l'ordinateur
             echo "Redémarrage en cours..."
             sudo reboot
+            echo " $date - redemarrage de l'ordinateur " >> $filePath
             break
             ;;
         
@@ -35,12 +58,16 @@ while true; do
             # Ici on utilise `gnome-screensaver-command` si disponible, sinon `loginctl lock-session` ou `xtrlock`
             if command -v gnome-screensaver-command &>/dev/null; then
                 gnome-screensaver-command -l
+                echo " $date - verrouillage de l'ordinateur " >> $filePath
             elif command -v loginctl &>/dev/null; then
                 loginctl lock-session
+                echo " $date - verrouillage de l'ordinateur " >> $filePath
             elif command -v xtrlock &>/dev/null; then
                 xtrlock
+                echo " $date - verrouillage de l'ordinateur " >> $filePath
             else
                 echo "Impossible de verrouiller la session : aucune méthode disponible."
+                echo " $date - erreur non verouillage de l'ordinateur " >> $filePath
             fi
             ;;
         
