@@ -1,13 +1,11 @@
 #!/bin/bash
 
-
-
-#debut de script 
+# Début de script
 debut_script() {
     clear
     echo "=== Menu Principal ==="
-    echo "1. action sur Utilisateurs ou ordinateur"
-    echo "2. Information sur utilisateurs ou Ordinateurs"
+    echo "1. Action sur Utilisateurs ou Ordinateur"
+    echo "2. Information sur Utilisateurs ou Ordinateurs"
     echo "3. Quitter"
     read -p "Choisissez une option: " choice
 
@@ -18,8 +16,6 @@ debut_script() {
         *) echo "Choix invalide !" && debut_script ;;
     esac
 }
-
-
 
 # Menu principal
 main_menu() {
@@ -39,8 +35,8 @@ main_menu() {
 }
 
 # Sous-menu pour la gestion des utilisateurs
-clear
 menu_gestion_utilisateur() {
+    clear
     echo "=== Gestion des Utilisateurs ==="
     echo "1. Compte Utilisateur"
     echo "2. Groupes"
@@ -54,7 +50,6 @@ menu_gestion_utilisateur() {
         *) echo "Choix invalide !" && menu_gestion_utilisateur ;;
     esac
 }
-
 
 # Sous-menu pour la gestion des ordinateurs
 menu_gestion_ordinateur() {
@@ -70,8 +65,8 @@ menu_gestion_ordinateur() {
     read -p "Choisissez une option: " choice
 
     case $choice in
-        1) source commande_d'alimentation.sh ;;
-        2) source Mise_à_jour_du_système.sh ;;
+        1) source commande_d_alimentation.sh ;;
+        2) source Mise_a_jour_du_systeme.sh ;;
         3) source gestion_repertoire.sh ;;
         4) remote_access_menu ;;
         5) source gestion_du_pare_feu.sh ;;
@@ -110,8 +105,8 @@ menu_information_utilisateur() {
     read -p "Choisissez une option: " choice
 
     case $choice in
-        1) source historique_des_activités_utilisateurs.sh ;;
-        2) source profil_et_activités_utilisateurs.sh ;;
+        1) source historique_des_activites_utilisateurs.sh ;;
+        2) source profil_et_activites_utilisateurs.sh ;;
         3) source Droits_permissions_utilisateur.sh ;;
         4) main_menu2 ;;
         *) echo "Choix invalide !" && menu_information_utilisateur ;;
