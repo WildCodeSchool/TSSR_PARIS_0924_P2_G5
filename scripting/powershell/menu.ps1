@@ -42,50 +42,10 @@ function Menu-Gestion-Utilisateur {
     $choice = Read-Host "Choisissez une option"
 
     switch ($choice) {
-        1 { Menu-Compte-Utilisateur }
-        2 { Menu-Groupe-Utilisateur }
+        1 { & "./Compte_Utilisateur.ps1" }
+        2 { & "./Groupes.ps1" }
         3 { Main-Menu }
         default { Write-Host "Choix invalide !" ; Menu-Gestion-Utilisateur }
-    }
-}
-
-# Sous-menu pour les comptes utilisateurs
-function Menu-Compte-Utilisateur {
-    Clear-Host
-    Write-Host "=== Compte Utilisateur ==="
-    Write-Host "1. Création de compte utilisateur local"
-    Write-Host "2. Changement de mot de passe"
-    Write-Host "3. Suppression de compte utilisateur local"
-    Write-Host "4. Désactivation de compte utilisateur local"
-    Write-Host "5. Retour"
-    $choice = Read-Host "Choisissez une option"
-
-    switch ($choice) {
-        1 { Create-Local-User }
-        2 { Change-Password }
-        3 { Delete-Local-User }
-        4 { Disable-Local-User }
-        5 { Menu-Gestion-Utilisateur }
-        default { Write-Host "Choix invalide !" ; Menu-Compte-Utilisateur }
-    }
-}
-
-# Sous-menu pour la gestion des groupes
-function Menu-Groupe-Utilisateur {
-    Clear-Host
-    Write-Host "=== Gestion des Groupes ==="
-    Write-Host "1. Ajout à un groupe d'administration"
-    Write-Host "2. Ajout à un groupe local"
-    Write-Host "3. Sortie d'un groupe local"
-    Write-Host "4. Retour"
-    $choice = Read-Host "Choisissez une option"
-
-    switch ($choice) {
-        1 { Add-To-Admin-Group }
-        2 { Add-To-Local-Group }
-        3 { Remove-From-Local-Group }
-        4 { Menu-Gestion-Utilisateur }
-        default { Write-Host "Choix invalide !" ; Menu-Groupe-Utilisateur }
     }
 }
 
@@ -96,20 +56,18 @@ function Menu-Gestion-Ordinateur {
     Write-Host "1. Commande d'alimentation"
     Write-Host "2. Mise à jour du système"
     Write-Host "3. Gestion de répertoire"
-    Write-Host "4. Prise en main à distance"
-    Write-Host "5. Gestion du pare-feu"
-    Write-Host "6. Gestion des logiciels"
-    Write-Host "7. Retour au Menu Principal"
+    Write-Host "4. Gestion du pare-feu"
+    Write-Host "5. Gestion des logiciels"
+    Write-Host "6. Retour au Menu Principal"
     $choice = Read-Host "Choisissez une option"
 
     switch ($choice) {
-        1 { Power-Management-Menu }
-        2 { Update-System }
+        1 { & "./Commandes_d'alimentation.ps1" }
+        2 { & "./Mise_a_jour_du_systeme.ps1" }
         3 { & "./Gestion_repertoire.ps1"}
-        4 { Remote-Access-Menu }
-        5 { Firewall-Management }
-        6 { Software-Management }
-        7 { Main-Menu }
+        4 { & "./gestion_du_pare_feu.ps1" }
+        5 { & "./install_desinstall_logiciel.ps1" }
+        6 { Main-Menu }
         default { Write-Host "Choix invalide !" ; Menu-Gestion-Ordinateur }
     }
 }
@@ -143,9 +101,9 @@ function Menu-Information-Utilisateur {
     $choice = Read-Host "Choisissez une option"
 
     switch ($choice) {
-        1 { Get-User-Activity-History }
-        2 { Get-User-Profile-Activity }
-        3 { Get-User-Permissions }
+        1 { & "./historique_des_activités_utilisateurs.ps1" }
+        2 { & "./profil_et_activités_utilisateurs.ps1"}
+        3 { & "./Droits_permissions_utilisateur.ps1"}
         4 { Main-Menu2 }
         default { Write-Host "Choix invalide !" ; Menu-Information-Utilisateur }
     }
@@ -163,10 +121,10 @@ function Menu-Information-Ordinateur {
     $choice = Read-Host "Choisissez une option"
 
     switch ($choice) {
-        1 { Get-OS-Version }
-        2 { Get-Disk-Info }
-        3 { Get-System-Resource-State }
-        4 { Get-RAM-Info }
+        1 { & "./version_os.ps1" }
+        2 { & "./information_disque.ps1" }
+        3 { & "./etat_systeme_ressource.ps1" }
+        4 { & "./information_ram.ps1" }
         5 { Main-Menu2 }
         default { Write-Host "Choix invalide !" ; Menu-Information-Ordinateur }
     }
