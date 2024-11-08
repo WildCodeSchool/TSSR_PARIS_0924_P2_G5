@@ -1,9 +1,29 @@
+$filePath =  "./historique_activité_utilisateurlog.txt"
+$date = Get-Date
+
+# Fonction pour créer un fichier log
+function Create-File {
+    param (
+        [string]$filePath
+    )
+
+    if (-not (Test-Path -Path $filePath)) {
+        New-Item -ItemType File -Path $filePath -Force | Out-Null
+        Write-Output "Fichier '$filePath' créé avec succès."
+        # Ajout d'un message de création dans le fichier
+        Add-Content -Path $filePath -Value "$date - Fichier créé"
+    } else {
+        Write-Output "Le fichier '$filePath' existe déjà." > $null
+    }
+}
+
 # Fonction pour afficher la date de la dernière connexion de l'utilisateur
 function Connexion-Utilisateur {
     # Utilisation de Get-EventLog pour obtenir les événements de connexion
     $lastLogon = Get-WinEvent -LogName Security | Where-Object {$_.Id -eq 4624} | Select-Object -First 1 -Property TimeCreated, Message
     Write-Host "Dernière connexion : $($lastLogon.TimeCreated)"
     Write-Host "Détails : $($lastLogon.Message)"
+    Add-Content -Path $filePath -Value "$date - information de derniere connexion obtenu."
 }
 
 # Fonction pour afficher la date de la dernière modification du mot de passe d'un utilisateur
@@ -14,6 +34,7 @@ function MotDePasse-Utilisateur {
         $user = Get-LocalUser -Name $nom
         $lastPasswordSet = $user.PasswordLastSet
         Write-Host "Dernière modification du mot de passe pour $nom : $lastPasswordSet"
+        Add-Content -Path $filePath -Value "$date - date de derniere modification du mots de passe de $nom obtenu."
     } catch {
         Write-Host "Utilisateur introuvable."
     }
@@ -26,6 +47,7 @@ function Session-Ouverte-Utilisateur {
     if ($sessions.UserName) {
         Write-Host "Sessions ouvertes :"
         Write-Host $sessions.UserName
+        Add-Content -Path $filePath -Value "$date - liste des dernière session ouverte obtenu."
     } else {
         Write-Host "Aucune session ouverte."
     }

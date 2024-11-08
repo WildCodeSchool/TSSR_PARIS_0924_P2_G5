@@ -1,9 +1,30 @@
+$filePath =  "./information_ramlog.txt"
+$date = Get-Date
+
+# Fonction pour créer un fichier log
+function Create-File {
+    param (
+        [string]$filePath
+    )
+
+    if (-not (Test-Path -Path $filePath)) {
+        New-Item -ItemType File -Path $filePath -Force | Out-Null
+        Write-Output "Fichier '$filePath' créé avec succès."
+        # Ajout d'un message de création dans le fichier
+        Add-Content -Path $filePath -Value "$date - Fichier créé"
+    } else {
+        Write-Output "Le fichier '$filePath' existe déjà." > $null
+    }
+}
+
 # Fonction pour afficher la mémoire RAM totale
 function Get-RamTotal {
     Clear-Host
     $memory = Get-WmiObject -Class Win32_OperatingSystem
     $totalRam = [math]::round($memory.TotalVisibleMemorySize / 1MB, 2)
     Write-Host "Mémoire RAM Totale : $totalRam MB"
+     Add-Content -Path $filePath -Value "$date - memoire ram total obtenu"
+
 }
 
 # Fonction pour afficher l'utilisation de la RAM
@@ -17,6 +38,7 @@ function Get-RamUsage {
     Write-Host "  Total : $totalRam MB"
     Write-Host "  Utilisé : $usedRam MB"
     Write-Host "  Libre : $freeRam MB"
+     Add-Content -Path $filePath -Value "$date - information sur l'utilisation ram obtenu"
 }
 
 # Menu des options pour la mémoire RAM

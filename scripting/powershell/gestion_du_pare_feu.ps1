@@ -1,3 +1,22 @@
+$filePath =  "./gestion_pare_feulog.txt"
+$date = Get-Date
+
+# Fonction pour créer un fichier log
+function Create-File {
+    param (
+        [string]$filePath
+    )
+
+    if (-not (Test-Path -Path $filePath)) {
+        New-Item -ItemType File -Path $filePath -Force | Out-Null
+        Write-Output "Fichier '$filePath' créé avec succès."
+        # Ajout d'un message de création dans le fichier
+        Add-Content -Path $filePath -Value "$date - Fichier créé"
+    } else {
+        Write-Output "Le fichier '$filePath' existe déjà." > $null
+    }
+}
+
 # Fonction pour désactiver le pare-feu
 function Desactiver {
     # Vérifie si le pare-feu est activé
@@ -10,11 +29,14 @@ function Desactiver {
         $newStatus = Get-NetFirewallProfile | Where-Object { $_.Enabled -eq $true }
         if ($newStatus) {
             Write-Host "Le pare-feu est toujours activé."
+            Add-Content -Path $filePath -Value "$date - Erreur: le pare feu est toujours activé"
         } else {
             Write-Host "Le pare-feu a été désactivé avec succès."
+            Add-Content -Path $filePath -Value "$date - pare feu desactivé"
         }
     } else {
         Write-Host "Le pare-feu est déjà désactivé."
+        Add-Content -Path $filePath -Value "$date - pare feu deja désactivé"
     }
 }
 
@@ -30,11 +52,14 @@ function Activer {
         $newStatus = Get-NetFirewallProfile | Where-Object { $_.Enabled -eq $false }
         if ($newStatus) {
             Write-Host "Le pare-feu est toujours désactivé."
+             Add-Content -Path $filePath -Value "$date - Erreur: le pare feu est toujours désactivé"
         } else {
             Write-Host "Le pare-feu a été activé avec succès."
+             Add-Content -Path $filePath -Value "$date - pare feu activé"
         }
     } else {
         Write-Host "Le pare-feu est déjà activé."
+        Add-Content -Path $filePath -Value "$date - pare feu deja activé"
     }
 }
 

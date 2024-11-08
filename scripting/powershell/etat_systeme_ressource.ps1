@@ -1,16 +1,38 @@
+$filePath =  "./etat_systeme_ressourcelog.txt"
+$date = Get-Date
+
+# Fonction pour créer un fichier log
+function Create-File {
+    param (
+        [string]$filePath
+    )
+
+    if (-not (Test-Path -Path $filePath)) {
+        New-Item -ItemType File -Path $filePath -Force | Out-Null
+        Write-Output "Fichier '$filePath' créé avec succès."
+        # Ajout d'un message de création dans le fichier
+        Add-Content -Path $filePath -Value "$date - Fichier créé"
+    } else {
+        Write-Output "Le fichier '$filePath' existe déjà." > $null
+    }
+}
+
 # Fonction pour lister les applications/paquets installés
 function Get-InstalledApplications {
     Get-WmiObject -Class Win32_Product | Select-Object Name, Version
+    Add-Content -Path $filePath -Value "$date - Liste des applications installé"
 }
 
 # Fonction pour lister les services en cours d'exécution
 function Get-RunningServices {
     Get-Service | Where-Object { $_.Status -eq 'Running' } | Select-Object Name, Status
+     Add-Content -Path $filePath -Value "$date - Liste des services en cours d'execution"
 }
 
 # Fonction pour lister les utilisateurs locaux
 function Get-LocalUsers {
     Get-LocalUser | Select-Object Name, Enabled
+     Add-Content -Path $filePath -Value "$date - Liste des utilisateurs locaux"
 }
 
 # Boucle du menu principal
