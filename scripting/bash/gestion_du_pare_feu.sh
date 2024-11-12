@@ -1,5 +1,12 @@
 #!/bin/bash
 
+#connection via ssh
+read -p "donner le nom du client :" sshname
+read -p "donner l'adresse ip du client :" sship
+
+nomssh=$sshname
+addressip=$sship
+
 filePath="./gestion_du_pare_feu.txt"
 # Date actuelle
 date=$(date)
@@ -24,26 +31,28 @@ create_file
 
 #fonction desactiver le pare feu
 function desactiver {
-    #ssh $nomssh@$adresseip
-if sudo ufw enable
+    ssh $nomssh@$addressip <<EOF
+if ufw enable
 then
-sudo ufw disable
-sudo ufw status 
-echo " $date - Le pare feu est desactivé " >> $filePath
+ufw disable
+ ufw status 
+
 exit 0
 fi 
+EOF
+echo " $date - Le pare feu est desactivé " >> $filePath
 }
 
 #fonction activer le pare feu
 function activer {
-     #ssh $nomssh@$adresseip
+    ssh $nomssh@$addressip <<EOF
 if sudo ufw disable
 then
 sudo ufw enable
 sudo ufw status 
-echo " $date - Le pare feu est activé " >> $filePath
-exit 0
 fi 
+EOF
+echo " $date - Le pare feu est activé " >> $filePath
 }
 
 
