@@ -1,8 +1,8 @@
 #!/bin/bash
 
-#connection via ssh
-read -p "donner le nom du client :" sshname
-read -p "donner l'adresse ip du client :" sship
+# Connexion via SSH
+read -p "Donner le nom du client : " sshname
+read -p "Donner l'adresse IP du client : " sship
 
 nomssh=$sshname
 addressip=$sship
@@ -20,7 +20,6 @@ create_file() {
         echo "Fichier '$filePath' créé avec succès."
         # Ajoute un message de création avec la date dans le fichier
         echo "$date - Fichier créé" >> "$filePath"
-        
     else
         echo "Le fichier '$filePath' existe déjà." > /dev/null
     fi
@@ -29,40 +28,31 @@ create_file() {
 # Appel de la fonction
 create_file
 
-#fonction desactiver le pare feu
+# Fonction pour désactiver le pare-feu
 function desactiver {
     ssh $nomssh@$addressip <<EOF
-if ufw enable
-then
-ufw disable
- ufw status 
-
-exit 0
-fi 
+    sudo ufw disable
+    ufw status
 EOF
-echo " $date - Le pare feu est desactivé " >> $filePath
+    echo "$date - Le pare-feu est désactivé" >> $filePath
 }
 
-#fonction activer le pare feu
+# Fonction pour activer le pare-feu
 function activer {
     ssh $nomssh@$addressip <<EOF
-if sudo ufw disable
-then
-sudo ufw enable
-sudo ufw status 
-fi 
+    sudo ufw enable
+    ufw status
 EOF
-echo " $date - Le pare feu est activé " >> $filePath
+    echo "$date - Le pare-feu est activé" >> $filePath
 }
-
 
 # Menu principal
 while true; do
     clear
     read -p "Choisissez une option : 
-    1) désactiver le pare feu
-    2) activer le pare feu
-    3) quitter
+    1) Désactiver le pare-feu
+    2) Activer le pare-feu
+    3) Quitter
 
     Votre choix : " choix
 
@@ -74,7 +64,6 @@ while true; do
             activer
             ;;
         3)
-            quitter
             echo "Au revoir!"
             exit 0
             ;;

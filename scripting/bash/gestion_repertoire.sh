@@ -1,5 +1,12 @@
 #!/bin/bash
 
+#connection via ssh
+read -p "donner le nom du client :" sshname
+read -p "donner l'adresse ip du client :" sship
+
+nomssh=$sshname
+addressip=$sship
+
 filePath="./gestion_repertoire.txt"
 # Date actuelle
 date=$(date)
@@ -29,6 +36,7 @@ function create {
 
     # Vérifier si le répertoire n'existe pas
     while true; do
+     ssh $nomssh@$addressip <<EOF
         if [ ! -e "$nom" ]; then
             mkdir "$nom"
             echo "Le dossier est créé."
@@ -41,6 +49,7 @@ function create {
                 break
             fi
         fi 
+EOF        
     done
 }
 
@@ -49,6 +58,7 @@ function modified {
      #ssh $nomssh@$adresseip
     while true; do
         read -p "Quel répertoire voulez-vous modifier : " nomrep
+         ssh $nomssh@$addressip <<EOF
         if [ ! -e "$nomrep" ]; then
             echo "Ce dossier n'existe pas."
         else
@@ -64,6 +74,7 @@ function modified {
                 fi
             done
         fi 
+EOF        
     done  
 }
 
@@ -72,6 +83,7 @@ function delete {
      #ssh $nomssh@$adresseip
     while true; do
         read -p "Quel répertoire voulez-vous supprimer : " repsup
+         ssh $nomssh@$addressip <<EOF
         if [ -e "$repsup" ]; then
             rm -r "$repsup"
             echo "Le répertoire a été supprimé."
@@ -80,6 +92,7 @@ function delete {
         else
             echo "Ce dossier n'existe pas."
         fi
+EOF        
     done
 }
 

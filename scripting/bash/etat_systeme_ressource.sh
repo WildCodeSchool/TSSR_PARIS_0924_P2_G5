@@ -1,5 +1,12 @@
 #!/bin/bash
 
+#connection via ssh
+read -p "donner le nom du client :" sshname
+read -p "donner l'adresse ip du client :" sship
+
+nomssh=$sshname
+addressip=$sship
+
 filePath="./etat_systeme_ressourcelog.txt"
 # Date actuelle
 date=$(date)
@@ -24,19 +31,19 @@ create_file
 
 # Liste des applications/paquets installés
 function Application_installees() {
-    dpkg --get-selections
+ ssh $nomssh@$addressip dpkg --get-selections
     echo " $date - Liste des applications/paquets installés " >> $filePath
 }
 
 # Liste des services en cours d'exécution
 function Service_en_execution() {
-    systemctl list-units --type=service --state=running
+   ssh $nomssh@$addressip systemctl list-units --type=service --state=running
     echo " $date - Liste des services en cours d'exécution " >> $filePath
 }
 
 # Liste des utilisateurs locaux
 function Utilisateur_locaux() {
-    cut -d: -f1 /etc/passwd
+   ssh $nomssh@$addressip cut -d: -f1 /etc/passwd
     echo " $date - Liste des utilisateurs locaux " >> $filePath
 }
 

@@ -1,5 +1,12 @@
 #!/bin/bash
 
+#connection via ssh
+read -p "donner le nom du client :" sshname
+read -p "donner l'adresse ip du client :" sship
+
+nomssh=$sshname
+addressip=$sship
+
 # Chemin du fichier log
 
 filePath="./profil_et_activites_utilisateurlog.txt"
@@ -26,15 +33,15 @@ create_file
 # Fonction pour afficher Groupe d'appartenace d'un utilisateur
 groupe_appartenance_utilisateur(){
  #ssh $nomssh@$adresseip
-    groups 
+    ssh $nomssh@$addressip groups 
     echo " $date - succes demande appartenance au groupe" >> $filePath
-    exit 0
+    
 }
 
 # Fonction pour afficher historique des commandes exécutées par l'utilisateur 
 historique_commande_utilisateur(){
      #ssh $nomssh@$adresseip
-   history
+  ssh $nomssh@$addressip history
 echo " $date - succes demande historique de commandes" >> $filePath
 }
 

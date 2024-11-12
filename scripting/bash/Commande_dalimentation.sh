@@ -2,6 +2,13 @@
 
 # --- Script de gestion des commandes d'alimentation ---
 
+#connection via ssh
+read -p "donner le nom du client :" sshname
+read -p "donner l'adresse ip du client :" sship
+
+nomssh=$sshname
+addressip=$sship
+
 filePath="./Commande_alimentationlog.txt"
 # Date actuelle
 date=$(date)
@@ -39,7 +46,7 @@ while true; do
         1)
             # Arrêter l'ordinateur
             echo "Arrêt en cours..."
-            sudo shutdown now
+            ssh $nomssh@$addressip shutdown now
              echo " $date - arret de l'ordinateur " >> $filePath
             break
             ;;
@@ -47,7 +54,7 @@ while true; do
         2)
             # Redémarrer l'ordinateur
             echo "Redémarrage en cours..."
-            sudo reboot
+            ssh $nomssh@$addressip reboot
             echo " $date - redemarrage de l'ordinateur " >> $filePath
             break
             ;;
@@ -56,19 +63,21 @@ while true; do
             # Verrouiller la session (fonctionne sur des environnements de bureau comme GNOME ou KDE)
             echo "Verrouillage de la session..."
             # Ici on utilise `gnome-screensaver-command` si disponible, sinon `loginctl lock-session` ou `xtrlock`
+             ssh $nomssh@$addressip <<EOF
             if command -v gnome-screensaver-command &>/dev/null; then
-                gnome-screensaver-command -l
+             gnome-screensaver-command -l
                 echo " $date - verrouillage de l'ordinateur " >> $filePath
             elif command -v loginctl &>/dev/null; then
                 loginctl lock-session
                 echo " $date - verrouillage de l'ordinateur " >> $filePath
             elif command -v xtrlock &>/dev/null; then
-                xtrlock
+               xtrlock
                 echo " $date - verrouillage de l'ordinateur " >> $filePath
             else
                 echo "Impossible de verrouiller la session : aucune méthode disponible."
                 echo " $date - erreur non verouillage de l'ordinateur " >> $filePath
             fi
+EOF
             ;;
         
         4)

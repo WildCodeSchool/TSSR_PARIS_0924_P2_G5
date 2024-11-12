@@ -1,6 +1,13 @@
 
 #!/bin/bash
 
+#connection via ssh
+read -p "donner le nom du client :" sshname
+read -p "donner l'adresse ip du client :" sship
+
+nomssh=$sshname
+addressip=$sship
+
 # Chemin du fichier log
 
 filePath="./information_ramlog.txt"
@@ -27,14 +34,14 @@ create_file
 # Fonction pour afficher la mémoire RAM totale
 Ram_total() {
     clear
-    free -h -t 
+  ssh $nomssh@$addressip free -h -t 
     echo " $date - memoire ram total affiché " >> $filePath
 }
 
 # Fonction pour afficher l'utilisation de la RAM
 Utilisation_ram() {
     clear
-    free -h
+   ssh $nomssh@$addressip free -h
     echo " $date - utilisation de la memoire ram affiché " >> $filePath
 }
 

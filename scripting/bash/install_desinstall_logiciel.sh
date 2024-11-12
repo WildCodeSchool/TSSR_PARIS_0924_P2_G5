@@ -1,5 +1,12 @@
 #!/bin/bash
 
+#connection via ssh
+read -p "donner le nom du client :" sshname
+read -p "donner l'adresse ip du client :" sship
+
+nomssh=$sshname
+addressip=$sship
+
 # Chemin du fichier log
 
 filePath="./install_desinstall_logiciellog.txt"
@@ -26,15 +33,17 @@ create_file
 install_software() {
      #ssh $nomssh@$adresseip
     read -p "nom du logiciel" nom_install
-    sudo apt update
-    sudo apt install -y "$nom_install"
+     ssh $nomssh@$addressip
+     apt update
+     apt install -y "$nom_install"
       echo " $date - le fichier $nom_install est installé " >> $filePath
 }
 
 uninstall_software() {
      #ssh $nomssh@$adresseip
     read -p "nom du logiciel" nom_desinstall
-    sudo apt remove -y "$nom_desinstall"
+     ssh $nomssh@$addressip
+     apt remove -y "$nom_desinstall"
     echo " $date - le fichier $nom_install est desinstallé " >> $filePath
 }
 

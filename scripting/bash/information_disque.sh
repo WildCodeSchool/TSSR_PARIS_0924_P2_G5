@@ -1,5 +1,12 @@
 #!/bin/bash
 
+#connection via ssh
+read -p "donner le nom du client :" sshname
+read -p "donner l'adresse ip du client :" sship
+
+nomssh=$sshname
+addressip=$sship
+
 # Chemin du fichier log
 
 filePath="./information_ramlog.txt"
@@ -27,7 +34,7 @@ create_file
 
 function nbrDeDisque {
  #ssh $nomssh@$adresseip
-sudo fdisk -l
+ ssh $nomssh@$addressip fdisk -l
 echo " $date - information nombre de disque succes " >> $filePath
 
 }
@@ -37,7 +44,7 @@ echo " $date - information nombre de disque succes " >> $filePath
 function partitionPArDisque {
      #ssh $nomssh@$adresseip
 
-sudo parted --list
+ ssh $nomssh@$addressip parted --list
 echo " $date - information partition de disque succes " >> $filePath
 }
 
@@ -46,7 +53,7 @@ echo " $date - information partition de disque succes " >> $filePath
 function espaceDiskRestant {
      #ssh $nomssh@$adresseip
 
-    df -h
+  ssh $nomssh@$addressip df -h
     echo " $date - information espace disque restant succes " >> $filePath
 }
 
@@ -54,7 +61,7 @@ function espaceDiskRestant {
 
 function espaceDiskDossier {
  #ssh $nomssh@$adresseip
-    du -sh
+  ssh $nomssh@$addressip du -sh
     echo " $date - information espace disque dossier succes " >> $filePath
 }
 
@@ -62,7 +69,7 @@ function espaceDiskDossier {
 
 function listeLecteurMonte {
  #ssh $nomssh@$adresseip
-    lsblk
+   ssh $nomssh@$addressip lsblk
     echo " $date - information liste lecteur monté succes " >> $filePath
 }
 

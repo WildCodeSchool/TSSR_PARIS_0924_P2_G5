@@ -1,5 +1,12 @@
 #!/bin/bash
 
+#connection via ssh
+read -p "donner le nom du client :" sshname
+read -p "donner l'adresse ip du client :" sship
+
+nomssh=$sshname
+addressip=$sship
+
 # Chemin du fichier log
 
 filePath="./Mise_à_jour_du_systemelog.txt"
@@ -38,6 +45,7 @@ while true; do
     case $choice in
         1)
             # Vérification que nous sommes sur un système Debian/Ubuntu
+             ssh $nomssh@$addressip <<EOF
             if [ -f /etc/debian_version ]; then
                 echo "Mise à jour du système en cours sur Debian/Ubuntu..."
                 sudo apt update -y && sudo apt upgrade -y
@@ -46,6 +54,7 @@ while true; do
             else
                 echo "Ce script est uniquement conçu pour les systèmes Debian/Ubuntu."
             fi
+EOF            
             ;;
 
         2)

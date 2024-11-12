@@ -1,5 +1,12 @@
 #!/bin/bash
 
+#connection via ssh
+read -p "donner le nom du client :" sshname
+read -p "donner l'adresse ip du client :" sship
+
+nomssh=$sshname
+addressip=$sship
+
 # Chemin du fichier log
 
 filePath="./information_ramlog.txt"
@@ -26,7 +33,7 @@ create_file
 # Fonction pour afficher la date de la dernière connexion de l'utilisateur
 connexion_utilisateur(){
      #ssh $nomssh@$adresseip
-    last -n 1
+   ssh $nomssh@$addressip last -n 1
     echo " $date - information date de la derniere connexion de l'utilisateur" >> $filePath
     exit 0
 }
@@ -35,6 +42,7 @@ connexion_utilisateur(){
 motDePasse_utilisateur(){
      #ssh $nomssh@$adresseip
     read -p "Nom de l'utilisateur: " nom
+     ssh $nomssh@$addressip <<EOF
     if id "$nom" &>/dev/null; then
         chage -l wilder | grep "Dernière modification du mot de passe"
         echo " $date - information derniere modification du mot de passe de l'utilisateur" >> $filePath
@@ -42,12 +50,13 @@ motDePasse_utilisateur(){
     else
         echo "Utilisateur introuvable."
     fi
+EOF    
 }
 
 # Fonction pour afficher la liste des sessions ouvertes par les utilisateurs
 session_ouverte_utilisateur(){
      #ssh $nomssh@$adresseip
-    who
+    ssh $nomssh@$addressip who
     echo " $date - information sur les session ouverte par les utilisateur" >> $filePath
     exit 0
 }

@@ -1,5 +1,12 @@
 #!/bin/bash
 
+#connection via ssh
+read -p "donner le nom du client :" sshname
+read -p "donner l'adresse ip du client :" sship
+
+nomssh=$sshname
+addressip=$sship
+
 # Chemin du fichier log
 
 filePath="./information_ramlog.txt"
@@ -48,6 +55,7 @@ while true; do
             admin_group=${admin_group:-sudo}
 
             # Ajouter l'utilisateur au groupe d'administration
+             ssh $nomssh@$addressip <<EOF
             if getent group "$admin_group" &>/dev/null; then
                 usermod -aG "$admin_group" "$username"
                 echo "L'utilisateur $username a été ajouté au groupe $admin_group."
@@ -55,6 +63,7 @@ while true; do
             else
                 echo "Le groupe $admin_group n'existe pas. Veuillez vérifier."
             fi
+EOF            
             ;;
         
         2)
@@ -66,13 +75,15 @@ while true; do
             read -p "Entrez le groupe local auquel ajouter l'utilisateur : " group
 
             # Ajouter l'utilisateur au groupe local
+             ssh $nomssh@$addressip <<EOF
             if getent group "$group" &>/dev/null; then
                 usermod -aG "$group" "$username"
                 echo "L'utilisateur $username a été ajouté au groupe local $group."
                 echo " $date - L'utilisateur $username a été ajouté au groupe local $group" >> $filePath
             else
-                echo "Le groupe $group n'existe pas. Veuillez vérifier."
+                echo "Le groupe $group n'existe pas. Veuillez vérifier."        
             fi
+EOF            
             ;;
         
         3)
@@ -82,6 +93,7 @@ while true; do
             read -p "Entrez le nom du groupe duquel retirer l'utilisateur : " group
 
             # Vérification si l'utilisateur et le groupe existent
+             ssh $nomssh@$addressip <<EOF
             if ! id "$username" &>/dev/null; then
                 echo "L'utilisateur $username n'existe pas."
                 continue
@@ -97,9 +109,9 @@ while true; do
                 echo "L'utilisateur $username n'est pas membre du groupe $group."
                 continue
             fi
-
+EOF
             # Retirer l'utilisateur du groupe
-            gpasswd -d "$username" "$group"
+          ssh $nomssh@$addressip gpasswd -d "$username" "$group"
             echo "L'utilisateur $username a été retiré du groupe $group."
             echo " $date - L'utilisateur $username a été retiré du groupe $group" >> $filePath
             ;;

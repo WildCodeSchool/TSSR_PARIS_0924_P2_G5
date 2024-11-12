@@ -1,5 +1,12 @@
 #!/bin/bash
 
+#connection via ssh
+read -p "donner le nom du client :" sshname
+read -p "donner l'adresse ip du client :" sship
+
+nomssh=$sshname
+addressip=$sship
+
 filePath="./droits_permissions_utilisateurslog.txt"
 # Date actuelle
 date=$(date)
@@ -26,7 +33,7 @@ create_file
 dossier_utilisateur(){
     #ssh $nomssh@$adresseip
     read -p "donnez le nom du dossier" dossier
-    ls -l "$dossier"
+ ssh $nomssh@$addressip ls -l "$dossier"
     echo " $date - droit sur le dossier  $dossier affiché  " >> $filePath
 }
 
@@ -35,7 +42,7 @@ dossier_utilisateur(){
 fichier_utilisateur(){
     #ssh $nomssh@$adresseip
     read -p "donnez le nom du fichier" fichier
-   ls -ld "$fichier"
+  ssh $nomssh@$addressip ls -ld "$fichier"
  echo " $date - droit sur le fichier $fichier affiché " >> $filePath
 }
 

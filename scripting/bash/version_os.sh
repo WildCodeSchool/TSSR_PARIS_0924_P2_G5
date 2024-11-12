@@ -1,6 +1,11 @@
 #!/bin/bash
 
-#!/bin/bash
+#connection via ssh
+read -p "donner le nom du client :" sshname
+read -p "donner l'adresse ip du client :" sship
+
+nomssh=$sshname
+addressip=$sship
 
 # Chemin du fichier log
 
@@ -28,5 +33,5 @@ create_file
 
 
  #ssh $nomssh@$adresseip
-lsb_release -a
+ ssh $nomssh@$addressip lsb_release -a
 echo " $date - succes demande os" >> $filePath
