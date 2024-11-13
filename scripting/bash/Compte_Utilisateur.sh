@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# --- Script de gestion des comptes utilisateurs ---
+
 # Connexion via SSH
 read -p "Donner le nom du client : " sshname
 read -p "Donner l'adresse IP du client : " sship
@@ -7,25 +9,31 @@ read -p "Donner l'adresse IP du client : " sship
 nomssh=$sshname
 addressip=$sship
 
-filePath="./compte_utilisateurslog.txt"
-# Date actuelle
-date=$(date)
+# Récupérer la date actuelle
+LOG_DATE=$(date +"%Y-%m-%d")
+LOG_FILE="/home/wilder/Documents/log_evt_$LOG_DATE.log"  # Chemin du fichier log avec la date dans le nom
+date=$(date "+%Y-%m-%d %H:%M:%S")  # Date et heure actuelles pour les entrées de log
 
 # Fonction pour créer un fichier log
 create_file() {
-    # Vérifie si le fichier existe
-    if [ ! -f "$filePath" ]; then
-        # Crée le fichier
-        touch "$filePath"
-        echo "Fichier '$filePath' créé avec succès."
+    # Vérifie si le fichier log existe
+    if [ ! -f "$LOG_FILE" ]; then
+        # Crée le fichier log
+        touch "$LOG_FILE"
+        echo "Fichier '$LOG_FILE' créé avec succès."
         # Ajoute un message de création avec la date dans le fichier
-        echo "$date - Fichier créé" >> "$filePath"
+        echo "$date - Fichier créé" >> "$LOG_FILE"
     else
-        echo "Le fichier '$filePath' existe déjà." > /dev/null
+        echo "Le fichier '$LOG_FILE' existe déjà." > /dev/null
     fi
 }
 
-# Appel de la fonction
+# Fonction pour enregistrer l'action dans le fichier log
+log_action() {
+    echo "$date - $1" >> "$LOG_FILE"
+}
+
+# Appel de la fonction pour créer le fichier log
 create_file
 
 # Fonction pour afficher le menu principal
@@ -63,10 +71,10 @@ menu_creation_compte_utilisateur() {
         sudo useradd "$newUser" > /dev/null
         if grep -q "^$newUser:" /etc/passwd; then
             echo "Utilisateur $newUser créé !"
-            echo "$date - utilisateur $newUser créé" >> $filePath
+            log_action "Utilisateur $newUser créé"
         else
             echo "Utilisateur $newUser non créé ==> problème"
-            echo "$date - erreur utilisateur $newUser non créé" >> $filePath
+            log_action "Erreur utilisateur $newUser non créé"
         fi
     fi
 EOF
@@ -98,10 +106,10 @@ menu_modification_mot_de_passe() {
     echo "$mdp" | sudo passwd --stdin $newUser
     if [ $? -eq 0 ]; then
         echo "Modification du mot de passe avec succès."
-        echo "$date - succès modification mot de passe" >> $filePath
+        log_action "Succès modification mot de passe"
     else
         echo "Erreur lors de la modification du mot de passe."
-        echo "$date - erreur modification mot de passe" >> $filePath
+        log_action "Erreur modification mot de passe"
     fi
 EOF
     read -p "Appuyez sur Entrée pour revenir au menu principal..."
@@ -119,13 +127,14 @@ menu_suppression_dun_compte_utilisateur() {
         sudo userdel -r -f "$delUser" 2> /dev/null
         if ! grep -qw "$delUser" /etc/passwd; then
             echo "Utilisateur $delUser supprimé."
-            echo "$date - utilisateur $delUser supprimé" >> $filePath
+            log_action "Utilisateur $delUser supprimé"
         else
             echo "! Erreur : Utilisateur $delUser non supprimé."
-            echo "$date - erreur utilisateur $delUser non supprimé" >> $filePath
+            log_action "Erreur utilisateur $delUser non supprimé"
         fi
     else
         echo -e "Utilisateur $delUser non existant.\nSortie du script."
+        log_action "Erreur : Utilisateur $delUser non existant"
         exit 1
     fi
 EOF
@@ -144,13 +153,14 @@ menu_désactiver_un_compte_utilisateur_local() {
         sudo usermod -L "$userToDisable"  # Lock the account
         if passwd -S "$userToDisable" | grep -q "L"; then  # Check if account is locked
             echo "Utilisateur $userToDisable désactivé."
-            echo "$date - utilisateur $userToDisable désactivé" >> $filePath
+            log_action "Utilisateur $userToDisable désactivé"
         else
             echo "! Erreur : Utilisateur $userToDisable non désactivé."
-            echo "$date - erreur utilisateur $userToDisable non désactivé" >> $filePath
+            log_action "Erreur utilisateur $userToDisable non désactivé"
         fi
     else
         echo -e "Utilisateur $userToDisable non existant.\nSortie du script."
+        log_action "Erreur : Utilisateur $userToDisable non existant"
         exit 1
     fi
 EOF

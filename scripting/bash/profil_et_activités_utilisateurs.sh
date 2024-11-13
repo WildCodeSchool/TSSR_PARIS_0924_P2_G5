@@ -1,58 +1,57 @@
 #!/bin/bash
 
-#connection via ssh
-read -p "donner le nom du client :" sshname
-read -p "donner l'adresse ip du client :" sship
+# Connexion via SSH
+read -p "Donner le nom du client : " sshname
+read -p "Donner l'adresse IP du client : " sship
 
 nomssh=$sshname
 addressip=$sship
 
-# Chemin du fichier log
-
-filePath="./profil_et_activites_utilisateurlog.txt"
-# Date actuelle
-date=$(date)
+# Récupérer la date actuelle
+LOG_DATE=$(date +"%Y-%m-%d")
+LOG_FILE="/home/wilder/Documents/log_evt_$LOG_DATE.log"  # Chemin du fichier log avec la date dans le nom
+date=$(date "+%Y-%m-%d %H:%M:%S")  # Date et heure actuelles pour les entrées de log
 
 # Fonction pour créer un fichier log
 create_file() {
-    # Vérifie si le fichier existe
-    if [ ! -f "$filePath" ]; then
-        # Crée le fichier
-        touch "$filePath"
-        echo "Fichier '$filePath' créé avec succès."
+    # Vérifie si le fichier log existe
+    if [ ! -f "$LOG_FILE" ]; then
+        # Crée le fichier log
+        touch "$LOG_FILE"
+        echo "Fichier '$LOG_FILE' créé avec succès."
         # Ajoute un message de création avec la date dans le fichier
-        echo "$date - Fichier créé" >> "$filePath"
+        echo "$date - Fichier créé" >> "$LOG_FILE"
     else
-        echo "Le fichier '$filePath' existe déjà." > /dev/null
+        echo "Le fichier '$LOG_FILE' existe déjà." > /dev/null
     fi
 }
 
-# Appel de la fonction
+# Fonction pour enregistrer l'action dans le fichier log
+log_action() {
+    echo "$date - $1" >> "$LOG_FILE"
+}
+
+# Appel de la fonction pour créer le fichier log
 create_file
 
-# Fonction pour afficher Groupe d'appartenace d'un utilisateur
-groupe_appartenance_utilisateur(){
- #ssh $nomssh@$adresseip
-    ssh $nomssh@$addressip groups 
-    echo " $date - succes demande appartenance au groupe" >> $filePath
-    
+# Fonction pour afficher le groupe d'appartenance d'un utilisateur
+groupe_appartenance_utilisateur() {
+    ssh $nomssh@$addressip groups
+    log_action "Succès demande appartenance au groupe"
 }
 
-# Fonction pour afficher historique des commandes exécutées par l'utilisateur 
-historique_commande_utilisateur(){
-     #ssh $nomssh@$adresseip
-  ssh $nomssh@$addressip history
-echo " $date - succes demande historique de commandes" >> $filePath
+# Fonction pour afficher l'historique des commandes exécutées par l'utilisateur
+historique_commande_utilisateur() {
+    ssh $nomssh@$addressip history
+    log_action "Succès demande historique de commandes"
 }
-
-
 
 # Menu des options d'historique d'activités utilisateur
 while true; do
     clear
     echo "=== Historique des activités utilisateur ==="
-    echo "1. Groupe d'appartenace d'un utilisateur"
-    echo "2. historique des commandes exécutées par l'utilisateur"
+    echo "1. Groupe d'appartenance d'un utilisateur"
+    echo "2. Historique des commandes exécutées par l'utilisateur"
     echo "3. Retour"
     read -p "Choisissez une option: " choice
 
@@ -60,9 +59,6 @@ while true; do
         1) groupe_appartenance_utilisateur ;;
         2) historique_commande_utilisateur ;;
         3) echo "Retour au menu principal..." ;;
-        *) echo "Choix invalide !"  ;;
+        *) echo "Choix invalide !" ;;
     esac
 done
-
-# Appel du menu principal pour lancer le script
-

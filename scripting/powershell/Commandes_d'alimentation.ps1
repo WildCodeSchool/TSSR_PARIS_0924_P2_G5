@@ -1,5 +1,6 @@
 # --- Script de gestion des commandes d'alimentation en PowerShell ---
 
+
 $filePath =  ".\commande_dalimentation.txt"
 $date = Get-Date
 
@@ -10,7 +11,7 @@ function Create-File {
     )
 
     if (-not (Test-Path -Path $filePath)) {
-        New-Item -ItemType File -Path $filePath -Force | Out-Null
+    New-Item -ItemType File -Path $filePath -Force | Out-Null
         Write-Output "Fichier '$filePath' créé avec succès."
         # Ajout d'un message de création dans le fichier
         Add-Content -Path $filePath -Value "$date - Fichier créé"

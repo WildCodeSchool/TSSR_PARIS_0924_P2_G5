@@ -1,115 +1,105 @@
 #!/bin/bash
 
-#connection via ssh
-read -p "donner le nom du client :" sshname
-read -p "donner l'adresse ip du client :" sship
+# Connexion via SSH
+read -p "Donner le nom du client : " sshname
+read -p "Donner l'adresse IP du client : " sship
 
 nomssh=$sshname
 addressip=$sship
 
-# Chemin du fichier log
-
-filePath="./information_ramlog.txt"
-# Date actuelle
-date=$(date)
+# Récupérer la date actuelle
+LOG_DATE=$(date +"%Y-%m-%d")
+LOG_FILE="/home/wilder/Documents/log_evt_$LOG_DATE.log"  # Chemin du fichier log avec la date dans le nom
+date=$(date "+%Y-%m-%d %H:%M:%S")  # Date et heure actuelles pour les entrées de log
 
 # Fonction pour créer un fichier log
 create_file() {
-    # Vérifie si le fichier existe
-    if [ ! -f "$filePath" ]; then
-        # Crée le fichier
-        touch "$filePath"
-        echo "Fichier '$filePath' créé avec succès."
+    # Vérifie si le fichier log existe
+    if [ ! -f "$LOG_FILE" ]; then
+        # Crée le fichier log
+        touch "$LOG_FILE"
+        echo "Fichier '$LOG_FILE' créé avec succès."
         # Ajoute un message de création avec la date dans le fichier
-        echo "$date - Fichier créé" >> "$filePath"
+        echo "$date - Fichier créé" >> "$LOG_FILE"
     else
-        echo "Le fichier '$filePath' existe déjà." > /dev/null
+        echo "Le fichier '$LOG_FILE' existe déjà." > /dev/null
     fi
 }
 
-# Appel de la fonction
+# Fonction pour enregistrer l'action dans le fichier log
+log_action() {
+    echo "$date - $1" >> "$LOG_FILE"
+}
+
+# Appel de la fonction pour créer le fichier log
 create_file
 
-#nombre de disque 
-
+# Nombre de disques
 function nbrDeDisque {
- #ssh $nomssh@$adresseip
- ssh $nomssh@$addressip fdisk -l
-echo " $date - information nombre de disque succes " >> $filePath
-
-}
- 
-#partition par disque
-
-function partitionPArDisque {
-     #ssh $nomssh@$adresseip
-
- ssh $nomssh@$addressip parted --list
-echo " $date - information partition de disque succes " >> $filePath
+    ssh $nomssh@$addressip fdisk -l
+    log_action "Information nombre de disque"
 }
 
-#espace disque restant par partition
+# Partition par disque
+function partitionParDisque {
+    ssh $nomssh@$addressip parted --list
+    log_action "Information partition de disque"
+}
 
+# Espace disque restant par partition
 function espaceDiskRestant {
-     #ssh $nomssh@$adresseip
-
-  ssh $nomssh@$addressip df -h
-    echo " $date - information espace disque restant succes " >> $filePath
+    ssh $nomssh@$addressip df -h
+    log_action "Information espace disque restant"
 }
 
-#nom et espace disque d'un dossier
-
+# Nom et espace disque d'un dossier
 function espaceDiskDossier {
- #ssh $nomssh@$adresseip
-  ssh $nomssh@$addressip du -sh
-    echo " $date - information espace disque dossier succes " >> $filePath
+    ssh $nomssh@$addressip du -sh
+    log_action "Information espace disque dossier"
 }
 
-#liste des disque monté
-
+# Liste des disques montés
 function listeLecteurMonte {
- #ssh $nomssh@$adresseip
-   ssh $nomssh@$addressip lsblk
-    echo " $date - information liste lecteur monté succes " >> $filePath
+    ssh $nomssh@$addressip lsblk
+    log_action "Information liste lecteur monté"
 }
-
-
 
 # Menu principal
 while true; do
     clear
-    read -p "Choisissez une option : 
-    1) Nombre de disque
-    2) Partition par disque
-    3) Espace disque restant par partition
-    4) nom et espace disque d'un dossier
-    5) Liste des disques monté
-    6) Quitter
-    Votre choix : " choix
+    echo "=============================="
+    echo "Menu de gestion des disques et partitions"
+    echo "=============================="
+    echo "1) Nombre de disques"
+    echo "2) Partition par disque"
+    echo "3) Espace disque restant par partition"
+    echo "4) Nom et espace disque d'un dossier"
+    echo "5) Liste des disques montés"
+    echo "6) Quitter"
+    read -p "Votre choix : " choix
 
     case $choix in
         1)
             nbrDeDisque
             ;;
         2)
-            partitionPArDisque
+            partitionParDisque
             ;;
         3)
             espaceDiskRestant
             ;;
-            4)
-             espaceDiskDossier
+        4)
+            espaceDiskDossier
             ;;
-            5) 
-             listeLecteurMonte
+        5)
+            listeLecteurMonte
             ;;
-            6)
-                echo "au revoir" 
-                exit 0
+        6)
+            echo "Au revoir!"
+            exit 0
             ;;
         *)
             echo "Choix invalide."
             ;;
     esac
 done
-

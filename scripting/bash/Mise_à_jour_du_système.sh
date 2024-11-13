@@ -1,39 +1,43 @@
 #!/bin/bash
 
-#connection via ssh
-read -p "donner le nom du client :" sshname
-read -p "donner l'adresse ip du client :" sship
+# Connexion via SSH
+read -p "Donner le nom du client : " sshname
+read -p "Donner l'adresse IP du client : " sship
 
 nomssh=$sshname
 addressip=$sship
 
-# Chemin du fichier log
-
-filePath="./Mise_à_jour_du_systemelog.txt"
-# Date actuelle
-date=$(date)
+# Récupérer la date actuelle
+LOG_DATE=$(date +"%Y-%m-%d")
+LOG_FILE="/home/wilder/Documents/log_evt_$LOG_DATE.log"  # Chemin du fichier log avec la date dans le nom
+date=$(date "+%Y-%m-%d %H:%M:%S")  # Date et heure actuelles pour les entrées de log
 
 # Fonction pour créer un fichier log
 create_file() {
-    # Vérifie si le fichier existe
-    if [ ! -f "$filePath" ]; then
-        # Crée le fichier
-        touch "$filePath"
-        echo "Fichier '$filePath' créé avec succès."
+    # Vérifie si le fichier log existe
+    if [ ! -f "$LOG_FILE" ]; then
+        # Crée le fichier log
+        touch "$LOG_FILE"
+        echo "Fichier '$LOG_FILE' créé avec succès."
         # Ajoute un message de création avec la date dans le fichier
-        echo "$date - Fichier créé" >> "$filePath"
+        echo "$date - Fichier créé" >> "$LOG_FILE"
     else
-        echo "Le fichier '$filePath' existe déjà." > /dev/null
+        echo "Le fichier '$LOG_FILE' existe déjà." > /dev/null
     fi
 }
 
-# Appel de la fonction
+# Fonction pour enregistrer l'action dans le fichier log
+log_action() {
+    echo "$date - $1" >> "$LOG_FILE"
+}
+
+# Appel de la fonction pour créer le fichier log
 create_file
 
 # --- Script de gestion de la mise à jour pour Ubuntu/Debian ---
-
 while true; do
     # Affichage du menu
+    clear
     echo "=============================="
     echo "Menu de gestion de mise à jour"
     echo "=============================="
@@ -45,12 +49,12 @@ while true; do
     case $choice in
         1)
             # Vérification que nous sommes sur un système Debian/Ubuntu
-             ssh $nomssh@$addressip <<EOF
+            ssh $nomssh@$addressip <<EOF
             if [ -f /etc/debian_version ]; then
                 echo "Mise à jour du système en cours sur Debian/Ubuntu..."
                 sudo apt update -y && sudo apt upgrade -y
                 echo "Mise à jour terminée avec succès !"
-                echo " $date - Mise à jour terminée avec succes" >> $filePath
+                log_action "Mise à jour terminée avec succès"
             else
                 echo "Ce script est uniquement conçu pour les systèmes Debian/Ubuntu."
             fi
@@ -60,12 +64,14 @@ EOF
         2)
             # Quitter le script
             echo "Au revoir !"
+            log_action "Quitter le script"
             exit 0
             ;;
 
         *)
             # Option invalide
             echo "Option invalide. Veuillez choisir une option entre 1 et 2."
+            log_action "Choix invalide"
             ;;
     esac
 

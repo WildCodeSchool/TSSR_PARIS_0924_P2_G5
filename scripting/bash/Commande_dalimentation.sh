@@ -2,36 +2,43 @@
 
 # --- Script de gestion des commandes d'alimentation ---
 
-#connection via ssh
-read -p "donner le nom du client :" sshname
-read -p "donner l'adresse ip du client :" sship
+# Connexion via SSH
+read -p "Donner le nom du client : " sshname
+read -p "Donner l'adresse IP du client : " sship
 
 nomssh=$sshname
 addressip=$sship
 
-filePath="./Commande_alimentationlog.txt"
-# Date actuelle
-date=$(date)
+# Récupérer la date actuelle
+LOG_DATE=$(date +"%Y-%m-%d")
+LOG_FILE="/home/wilder/Documents/log_evt_$LOG_DATE.log"  # Chemin du fichier log avec la date dans le nom
+date=$(date "+%Y-%m-%d %H:%M:%S")  # Date et heure actuelles pour les entrées de log
 
 # Fonction pour créer un fichier log
 create_file() {
-    # Vérifie si le fichier existe
-    if [ ! -f "$filePath" ]; then
-        # Crée le fichier
-        touch "$filePath"
-        echo "Fichier '$filePath' créé avec succès."
+    # Vérifie si le fichier log existe
+    if [ ! -f "$LOG_FILE" ]; then
+        # Crée le fichier log
+        touch "$LOG_FILE"
+        echo "Fichier '$LOG_FILE' créé avec succès."
         # Ajoute un message de création avec la date dans le fichier
-        echo "$date - Fichier créé" >> "$filePath"
+        echo "$date - Fichier créé" >> "$LOG_FILE"
     else
-        echo "Le fichier '$filePath' existe déjà." > /dev/null
+        echo "Le fichier '$LOG_FILE' existe déjà." > /dev/null
     fi
 }
 
-# Appel de la fonction
+# Fonction pour enregistrer l'action dans le fichier log
+log_action() {
+    echo "$date - $1" >> "$LOG_FILE"
+}
+
+# Appel de la fonction pour créer le fichier log
 create_file
 
 while true; do
     # Affichage du menu
+    clear
     echo "=============================="
     echo "Menu de gestion d'alimentation"
     echo "=============================="
@@ -46,38 +53,48 @@ while true; do
         1)
             # Arrêter l'ordinateur
             echo "Arrêt en cours..."
-            ssh $nomssh@$addressip shutdown now
-             echo " $date - arret de l'ordinateur " >> $filePath
+            if ssh $nomssh@$addressip "shutdown now"; then
+                log_action "Arrêt de l'ordinateur"
+            else
+                echo "Erreur de connexion ou d'exécution de la commande 'shutdown'."
+            fi
             break
             ;;
         
         2)
             # Redémarrer l'ordinateur
             echo "Redémarrage en cours..."
-            ssh $nomssh@$addressip reboot
-            echo " $date - redemarrage de l'ordinateur " >> $filePath
+            if ssh $nomssh@$addressip "reboot"; then
+                log_action "Redémarrage de l'ordinateur"
+            else
+                echo "Erreur de connexion ou d'exécution de la commande 'reboot'."
+            fi
             break
             ;;
         
         3)
-            # Verrouiller la session (fonctionne sur des environnements de bureau comme GNOME ou KDE)
+            # Verrouiller la session
             echo "Verrouillage de la session..."
-            # Ici on utilise `gnome-screensaver-command` si disponible, sinon `loginctl lock-session` ou `xtrlock`
-             ssh $nomssh@$addressip <<EOF
+            ssh $nomssh@$addressip <<EOF
             if command -v gnome-screensaver-command &>/dev/null; then
-             gnome-screensaver-command -l
-                echo " $date - verrouillage de l'ordinateur " >> $filePath
+                gnome-screensaver-command -l
+                exit 0
             elif command -v loginctl &>/dev/null; then
                 loginctl lock-session
-                echo " $date - verrouillage de l'ordinateur " >> $filePath
+                exit 0
             elif command -v xtrlock &>/dev/null; then
-               xtrlock
-                echo " $date - verrouillage de l'ordinateur " >> $filePath
+                xtrlock
+                exit 0
             else
                 echo "Impossible de verrouiller la session : aucune méthode disponible."
-                echo " $date - erreur non verouillage de l'ordinateur " >> $filePath
+                exit 1
             fi
 EOF
+            if [ $? -eq 0 ]; then
+                log_action "Verrouillage de l'ordinateur"
+            else
+                log_action "Erreur verrouillage de l'ordinateur"
+            fi
             ;;
         
         4)

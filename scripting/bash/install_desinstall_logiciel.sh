@@ -1,60 +1,64 @@
 #!/bin/bash
 
-#connection via ssh
-read -p "donner le nom du client :" sshname
-read -p "donner l'adresse ip du client :" sship
+# Connexion via SSH
+read -p "Donner le nom du client : " sshname
+read -p "Donner l'adresse IP du client : " sship
 
 nomssh=$sshname
 addressip=$sship
 
-# Chemin du fichier log
-
-filePath="./install_desinstall_logiciellog.txt"
-# Date actuelle
-date=$(date)
+# Récupérer la date actuelle
+LOG_DATE=$(date +"%Y-%m-%d")
+LOG_FILE="/home/wilder/Documents/log_evt_$LOG_DATE.log"  # Chemin du fichier log avec la date dans le nom
+date=$(date "+%Y-%m-%d %H:%M:%S")  # Date et heure actuelles pour les entrées de log
 
 # Fonction pour créer un fichier log
 create_file() {
-    # Vérifie si le fichier existe
-    if [ ! -f "$filePath" ]; then
-        # Crée le fichier
-        touch "$filePath"
-        echo "Fichier '$filePath' créé avec succès."
+    # Vérifie si le fichier log existe
+    if [ ! -f "$LOG_FILE" ]; then
+        # Crée le fichier log
+        touch "$LOG_FILE"
+        echo "Fichier '$LOG_FILE' créé avec succès."
         # Ajoute un message de création avec la date dans le fichier
-        echo "$date - Fichier créé" >> "$filePath"
+        echo "$date - Fichier créé" >> "$LOG_FILE"
     else
-        echo "Le fichier '$filePath' existe déjà." > /dev/null
+        echo "Le fichier '$LOG_FILE' existe déjà." > /dev/null
     fi
 }
 
-# Appel de la fonction
+# Fonction pour enregistrer l'action dans le fichier log
+log_action() {
+    echo "$date - $1" >> "$LOG_FILE"
+}
+
+# Appel de la fonction pour créer le fichier log
 create_file
 
 install_software() {
-     #ssh $nomssh@$adresseip
-    read -p "nom du logiciel" nom_install
-     ssh $nomssh@$addressip
-     apt update
-     apt install -y "$nom_install"
-      echo " $date - le fichier $nom_install est installé " >> $filePath
+    read -p "Nom du logiciel à installer : " nom_install
+    ssh $nomssh@$addressip <<EOF
+    sudo apt update
+    sudo apt install -y "$nom_install"
+EOF
+    log_action "Le logiciel $nom_install a été installé"
 }
 
 uninstall_software() {
-     #ssh $nomssh@$adresseip
-    read -p "nom du logiciel" nom_desinstall
-     ssh $nomssh@$addressip
-     apt remove -y "$nom_desinstall"
-    echo " $date - le fichier $nom_install est desinstallé " >> $filePath
+    read -p "Nom du logiciel à désinstaller : " nom_desinstall
+    ssh $nomssh@$addressip <<EOF
+    sudo apt remove -y "$nom_desinstall"
+EOF
+    log_action "Le logiciel $nom_desinstall a été désinstallé"
 }
 
+# Menu principal
 while true; do
     clear
-    read -p "Choisissez une option : 
-    1) installer logiciel
-    2) désinstaller logiciel
-    3) quitter
-
-    Votre choix : " choix
+    echo "=== Menu de gestion des logiciels ==="
+    echo "1) Installer un logiciel"
+    echo "2) Désinstaller un logiciel"
+    echo "3) Quitter"
+    read -p "Choisissez une option : " choix
 
     case $choix in
         1)
@@ -64,12 +68,11 @@ while true; do
             uninstall_software
             ;;
         3)
-            quitter
-            echo "Au revoir!"
+            echo "Au revoir !"
             exit 0
             ;;
         *)
             echo "Choix invalide."
             ;;
     esac
-    done
+done

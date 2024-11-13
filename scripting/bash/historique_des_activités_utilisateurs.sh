@@ -1,51 +1,53 @@
 #!/bin/bash
 
-#connection via ssh
-read -p "donner le nom du client :" sshname
-read -p "donner l'adresse ip du client :" sship
+# Connexion via SSH
+read -p "Donner le nom du client : " sshname
+read -p "Donner l'adresse IP du client : " sship
 
 nomssh=$sshname
 addressip=$sship
 
-# Chemin du fichier log
-
-filePath="./information_ramlog.txt"
-# Date actuelle
-date=$(date)
+# Récupérer la date actuelle
+LOG_DATE=$(date +"%Y-%m-%d")
+LOG_FILE="/home/wilder/Documents/log_evt_$LOG_DATE.log"  # Chemin du fichier log avec la date dans le nom
+date=$(date "+%Y-%m-%d %H:%M:%S")  # Date et heure actuelles pour les entrées de log
 
 # Fonction pour créer un fichier log
 create_file() {
-    # Vérifie si le fichier existe
-    if [ ! -f "$filePath" ]; then
-        # Crée le fichier
-        touch "$filePath"
-        echo "Fichier '$filePath' créé avec succès."
+    # Vérifie si le fichier log existe
+    if [ ! -f "$LOG_FILE" ]; then
+        # Crée le fichier log
+        touch "$LOG_FILE"
+        echo "Fichier '$LOG_FILE' créé avec succès."
         # Ajoute un message de création avec la date dans le fichier
-        echo "$date - Fichier créé" >> "$filePath"
+        echo "$date - Fichier créé" >> "$LOG_FILE"
     else
-        echo "Le fichier '$filePath' existe déjà." > /dev/null
+        echo "Le fichier '$LOG_FILE' existe déjà." > /dev/null
     fi
 }
 
-# Appel de la fonction
+# Fonction pour enregistrer l'action dans le fichier log
+log_action() {
+    echo "$date - $1" >> "$LOG_FILE"
+}
+
+# Appel de la fonction pour créer le fichier log
 create_file
 
 # Fonction pour afficher la date de la dernière connexion de l'utilisateur
 connexion_utilisateur(){
-     #ssh $nomssh@$adresseip
-   ssh $nomssh@$addressip last -n 1
-    echo " $date - information date de la derniere connexion de l'utilisateur" >> $filePath
+    ssh $nomssh@$addressip last -n 1
+    log_action "Information sur la dernière connexion de l'utilisateur affichée"
     exit 0
 }
 
 # Fonction pour afficher la date de dernière modification du mot de passe d'un utilisateur
 motDePasse_utilisateur(){
-     #ssh $nomssh@$adresseip
     read -p "Nom de l'utilisateur: " nom
-     ssh $nomssh@$addressip <<EOF
+    ssh $nomssh@$addressip <<EOF
     if id "$nom" &>/dev/null; then
-        chage -l wilder | grep "Dernière modification du mot de passe"
-        echo " $date - information derniere modification du mot de passe de l'utilisateur" >> $filePath
+        chage -l "$nom" | grep "Dernière modification du mot de passe"
+        log_action "Information sur la dernière modification du mot de passe de l'utilisateur $nom affichée"
         exit 0
     else
         echo "Utilisateur introuvable."
@@ -55,9 +57,8 @@ EOF
 
 # Fonction pour afficher la liste des sessions ouvertes par les utilisateurs
 session_ouverte_utilisateur(){
-     #ssh $nomssh@$adresseip
     ssh $nomssh@$addressip who
-    echo " $date - information sur les session ouverte par les utilisateur" >> $filePath
+    log_action "Information sur les sessions ouvertes par les utilisateurs affichée"
     exit 0
 }
 
@@ -76,9 +77,6 @@ while true; do
         2) motDePasse_utilisateur ;;
         3) session_ouverte_utilisateur ;;
         4) echo "Retour au menu principal..." ;;
-        *) echo "Choix invalide !" && menu_historique_des_activités_utilisateur ;;
+        *) echo "Choix invalide !" && continue ;;
     esac
 done
-
-# Appel du menu principal pour lancer le script
-
