@@ -6,16 +6,19 @@ debut_script() {
     echo "=== Menu Principal ==="
     echo "1. Action sur Utilisateurs ou Ordinateur"
     echo "2. Information sur Utilisateurs ou Ordinateurs"
-    echo "3. Quitter"
+    echo "3. journalisation"
+    echo "4. Quitter"
     read -p "Choisissez une option: " choice
 
     case $choice in
         1) main_menu ;;
         2) main_menu2 ;;
-        3) exit 0 ;;
+        3) source journalisation.sh ;;
+        4) exit 0 ;;
         *) echo "Choix invalide !" && debut_script ;;
     esac
 }
+
 
 # Menu principal
 main_menu() {

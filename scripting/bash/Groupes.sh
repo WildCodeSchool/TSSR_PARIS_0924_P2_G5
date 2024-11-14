@@ -34,24 +34,10 @@ log_action() {
 # Appel de la fonction pour créer le fichier log
 create_file
 
-# --- Script avec Menu interactif pour gérer les utilisateurs et les groupes ---
 
-while true; do
-    # Affichage du menu
-    clear
-    echo "=============================="
-    echo "Menu de gestion des utilisateurs"
-    echo "=============================="
-    echo "1. Ajouter un utilisateur à un groupe d'administration"
-    echo "2. Ajouter un utilisateur à un groupe local"
-    echo "3. Retirer un utilisateur d'un groupe"
-    echo "4. Quitter"
-    echo -n "Choisissez une option [1-4] : "
-    read choice
+addadmin(){
 
-    case $choice in
-        1)
-            # --- Ajouter un utilisateur à un groupe d'administration ---
+ # --- Ajouter un utilisateur à un groupe d'administration ---
             echo "=== Ajouter un utilisateur à un groupe d'administration ==="
             read -p "Entrez le nom de l'utilisateur : " username
             read -sp "Entrez le mot de passe de l'utilisateur : " password
@@ -69,10 +55,11 @@ while true; do
                 echo "Le groupe $admin_group n'existe pas. Veuillez vérifier."
             fi
 EOF            
-            ;;
-        
-        2)
-            # --- Ajouter un utilisateur à un groupe local ---
+
+}
+
+addlocal(){
+    # --- Ajouter un utilisateur à un groupe local ---
             echo "=== Ajouter un utilisateur à un groupe local ==="
             read -p "Entrez le nom de l'utilisateur : " username
             read -sp "Entrez le mot de passe de l'utilisateur : " password
@@ -89,36 +76,65 @@ EOF
                 echo "Le groupe $group n'existe pas. Veuillez vérifier."        
             fi
 EOF            
+}
+
+delete(){
+    # --- Retirer un utilisateur d'un groupe ---
+echo "=== Retirer un utilisateur d'un groupe ==="
+read -p "Entrez le nom de l'utilisateur : " username
+read -p "Entrez le nom du groupe duquel retirer l'utilisateur : " group
+
+# Vérification si l'utilisateur et le groupe existent et si l'utilisateur est membre du groupe
+ssh $nomssh@$addressip <<EOF
+if ! id "$username" &>/dev/null; then
+    echo "L'utilisateur $username n'existe pas."
+    exit 1
+fi
+
+if ! getent group "$group" &>/dev/null; then
+    echo "Le groupe $group n'existe pas."
+    exit 1
+fi
+
+# Vérification si l'utilisateur est membre du groupe
+if ! groups "$username" | grep -q "\b$group\b"; then
+    echo "L'utilisateur $username n'est pas membre du groupe $group."
+    exit 1
+fi
+
+# Retirer l'utilisateur du groupe
+sudo gpasswd -d "$username" "$group"
+echo "L'utilisateur $username a été retiré du groupe $group."
+log_action "L'utilisateur $username a été retiré du groupe $group"
+EOF
+}
+
+# --- Script avec Menu interactif pour gérer les utilisateurs et les groupes ---
+
+while true; do
+    # Affichage du menu
+    clear
+    echo "=============================="
+    echo "Menu de gestion des utilisateurs"
+    echo "=============================="
+    echo "1. Ajouter un utilisateur à un groupe d'administration"
+    echo "2. Ajouter un utilisateur à un groupe local"
+    echo "3. Retirer un utilisateur d'un groupe"
+    echo "4. Quitter"
+    echo -n "Choisissez une option [1-4] : "
+    read choice
+
+    case $choice in
+        1)
+           addadmin
+            ;;
+        
+        2)
+            addlocal
             ;;
         
         3)
-            # --- Retirer un utilisateur d'un groupe ---
-            echo "=== Retirer un utilisateur d'un groupe ==="
-            read -p "Entrez le nom de l'utilisateur : " username
-            read -p "Entrez le nom du groupe duquel retirer l'utilisateur : " group
-
-            # Vérification si l'utilisateur et le groupe existent
-            ssh $nomssh@$addressip <<EOF
-            if ! id "$username" &>/dev/null; then
-                echo "L'utilisateur $username n'existe pas."
-                continue
-            fi
-
-            if ! getent group "$group" &>/dev/null; then
-                echo "Le groupe $group n'existe pas."
-                continue
-            fi
-
-            # Vérification si l'utilisateur est membre du groupe
-            if ! groups "$username" | grep -q "\b$group\b"; then
-                echo "L'utilisateur $username n'est pas membre du groupe $group."
-                continue
-            fi
-EOF
-            # Retirer l'utilisateur du groupe
-            ssh $nomssh@$addressip gpasswd -d "$username" "$group"
-            echo "L'utilisateur $username a été retiré du groupe $group."
-            log_action "L'utilisateur $username a été retiré du groupe $group"
+           delete 
             ;;
         
         4)

@@ -38,7 +38,6 @@ create_file
 connexion_utilisateur(){
     ssh $nomssh@$addressip last -n 1
     log_action "Information sur la dernière connexion de l'utilisateur affichée"
-    exit 0
 }
 
 # Fonction pour afficher la date de dernière modification du mot de passe d'un utilisateur
@@ -48,7 +47,6 @@ motDePasse_utilisateur(){
     if id "$nom" &>/dev/null; then
         chage -l "$nom" | grep "Dernière modification du mot de passe"
         log_action "Information sur la dernière modification du mot de passe de l'utilisateur $nom affichée"
-        exit 0
     else
         echo "Utilisateur introuvable."
     fi
@@ -59,12 +57,10 @@ EOF
 session_ouverte_utilisateur(){
     ssh $nomssh@$addressip who
     log_action "Information sur les sessions ouvertes par les utilisateurs affichée"
-    exit 0
 }
 
 # Menu des options d'historique d'activités utilisateur
 while true; do
-    clear
     echo "=== Historique des activités utilisateur ==="
     echo "1. Date de dernière connexion d'un utilisateur"
     echo "2. Date de dernière modification du mot de passe"

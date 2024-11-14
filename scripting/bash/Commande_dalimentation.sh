@@ -53,10 +53,11 @@ while true; do
         1)
             # Arrêter l'ordinateur
             echo "Arrêt en cours..."
-            if ssh $nomssh@$addressip "shutdown now"; then
+            if ssh $nomssh@$addressip "sudo shutdown now"; then
                 log_action "Arrêt de l'ordinateur"
             else
                 echo "Erreur de connexion ou d'exécution de la commande 'shutdown'."
+                log_action "Erreur d'exécution de 'shutdown'"
             fi
             break
             ;;
@@ -64,10 +65,11 @@ while true; do
         2)
             # Redémarrer l'ordinateur
             echo "Redémarrage en cours..."
-            if ssh $nomssh@$addressip "reboot"; then
+            if ssh $nomssh@$addressip "sudo reboot"; then
                 log_action "Redémarrage de l'ordinateur"
             else
                 echo "Erreur de connexion ou d'exécution de la commande 'reboot'."
+                log_action "Erreur d'exécution de 'reboot'"
             fi
             break
             ;;
@@ -78,18 +80,22 @@ while true; do
             ssh $nomssh@$addressip <<EOF
             if command -v gnome-screensaver-command &>/dev/null; then
                 gnome-screensaver-command -l
+                echo "Session verrouillée avec gnome-screensaver-command"
                 exit 0
             elif command -v loginctl &>/dev/null; then
-                loginctl lock-session
+                sudo loginctl lock-session
+                echo "Session verrouillée avec loginctl"
                 exit 0
             elif command -v xtrlock &>/dev/null; then
-                xtrlock
+                sudo xtrlock
+                echo "Session verrouillée avec xtrlock"
                 exit 0
             else
                 echo "Impossible de verrouiller la session : aucune méthode disponible."
                 exit 1
             fi
 EOF
+            # Vérification de la réussite de l'opération
             if [ $? -eq 0 ]; then
                 log_action "Verrouillage de l'ordinateur"
             else
