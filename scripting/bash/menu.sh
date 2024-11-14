@@ -68,8 +68,8 @@ menu_gestion_ordinateur() {
     read -p "Choisissez une option: " choice
 
     case $choice in
-        1) source commande_d_alimentation.sh ;;
-        2) source Mise_a_jour_du_systeme.sh ;;
+        1) source Commande_dalimentation.sh ;;
+        2) source Mise_à_jour_du_système.sh ;;
         3) source gestion_repertoire.sh ;;
         4) remote_access_menu ;;
         5) source gestion_du_pare_feu.sh ;;
@@ -108,8 +108,8 @@ menu_information_utilisateur() {
     read -p "Choisissez une option: " choice
 
     case $choice in
-        1) source historique_des_activites_utilisateurs.sh ;;
-        2) source profil_et_activites_utilisateurs.sh ;;
+        1) source historique_des_activités_utilisateurs.sh ;;
+        2) source profil_et_activités_utilisateurs.sh ;;
         3) source Droits_permissions_utilisateur.sh ;;
         4) main_menu2 ;;
         *) echo "Choix invalide !" && menu_information_utilisateur ;;

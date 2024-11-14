@@ -34,9 +34,7 @@ log_action() {
 # Appel de la fonction pour créer le fichier log
 create_file
 
-
 addadmin(){
-
  # --- Ajouter un utilisateur à un groupe d'administration ---
             echo "=== Ajouter un utilisateur à un groupe d'administration ==="
             read -p "Entrez le nom de l'utilisateur : " username
@@ -55,7 +53,6 @@ addadmin(){
                 echo "Le groupe $admin_group n'existe pas. Veuillez vérifier."
             fi
 EOF            
-
 }
 
 addlocal(){
@@ -103,7 +100,7 @@ if ! groups "$username" | grep -q "\b$group\b"; then
 fi
 
 # Retirer l'utilisateur du groupe
-sudo gpasswd -d "$username" "$group"
+gpasswd -d "$username" "$group"
 echo "L'utilisateur $username a été retiré du groupe $group."
 log_action "L'utilisateur $username a été retiré du groupe $group"
 EOF

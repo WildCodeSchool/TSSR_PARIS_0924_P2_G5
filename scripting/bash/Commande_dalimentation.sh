@@ -3,8 +3,8 @@
 # --- Script de gestion des commandes d'alimentation ---
 
 # Connexion via SSH
-read -p "Donner le nom du client : " sshname
-read -p "Donner l'adresse IP du client : " sship
+#read -p "Donner le nom du client : " sshname
+#read -p "Donner l'adresse IP du client : " sship
 
 nomssh=$sshname
 addressip=$sship
@@ -36,48 +36,40 @@ log_action() {
 # Appel de la fonction pour créer le fichier log
 create_file
 
-while true; do
-    # Affichage du menu
-    clear
-    echo "=============================="
-    echo "Menu de gestion d'alimentation"
-    echo "=============================="
-    echo "1. Arrêter l'ordinateur"
-    echo "2. Redémarrer l'ordinateur"
-    echo "3. Verrouiller la session"
-    echo "4. Quitter"
-    echo -n "Choisissez une option [1-4] : "
-    read choice
+stop(){
 
-    case $choice in
-        1)
-            # Arrêter l'ordinateur
+  # Arrêter l'ordinateur
             echo "Arrêt en cours..."
-            if ssh $nomssh@$addressip "shutdown now"; then
+            if
+            # ssh $nomssh@$addressip 
+            "shutdown now"; then
                 log_action "Arrêt de l'ordinateur"
             else
                 echo "Erreur de connexion ou d'exécution de la commande 'shutdown'."
                 log_action "Erreur d'exécution de 'shutdown'"
             fi
-            break
-            ;;
-        
-        2)
-            # Redémarrer l'ordinateur
+            break   
+}
+
+reboot(){
+ # Redémarrer l'ordinateur
             echo "Redémarrage en cours..."
-            if ssh $nomssh@$addressip "reboot"; then
+            if 
+            #ssh $nomssh@$addressip 
+            "reboot"; then
                 log_action "Redémarrage de l'ordinateur"
             else
                 echo "Erreur de connexion ou d'exécution de la commande 'reboot'."
                 log_action "Erreur d'exécution de 'reboot'"
             fi
             break
-            ;;
-        
-        3)
-            # Verrouiller la session
+}
+
+veille(){
+
+     # Verrouiller la session
             echo "Verrouillage de la session..."
-            ssh $nomssh@$addressip <<EOF
+            #ssh $nomssh@$addressip <<EOF
             if command -v gnome-screensaver-command &>/dev/null; then
                 gnome-screensaver-command -l
                 echo "Session verrouillée avec gnome-screensaver-command"
@@ -94,13 +86,39 @@ while true; do
                 echo "Impossible de verrouiller la session : aucune méthode disponible."
                 exit 1
             fi
-EOF
+#EOF
             # Vérification de la réussite de l'opération
             if [ $? -eq 0 ]; then
                 log_action "Verrouillage de l'ordinateur"
             else
                 log_action "Erreur verrouillage de l'ordinateur"
             fi
+}
+
+while true; do
+    # Affichage du menu
+    clear
+    echo "=============================="
+    echo "Menu de gestion d'alimentation"
+    echo "=============================="
+    echo "1. Arrêter l'ordinateur"
+    echo "2. Redémarrer l'ordinateur"
+    echo "3. Verrouiller la session"
+    echo "4. Quitter"
+    echo -n "Choisissez une option [1-4] : "
+    read choice
+
+    case $choice in
+        1)
+          stop 
+            ;;
+        
+        2)
+         reboot  
+            ;;
+        
+        3)
+          veille 
             ;;
         
         4)
