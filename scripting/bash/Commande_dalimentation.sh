@@ -53,7 +53,7 @@ while true; do
         1)
             # Arrêter l'ordinateur
             echo "Arrêt en cours..."
-            if ssh $nomssh@$addressip "sudo shutdown now"; then
+            if ssh $nomssh@$addressip "shutdown now"; then
                 log_action "Arrêt de l'ordinateur"
             else
                 echo "Erreur de connexion ou d'exécution de la commande 'shutdown'."
@@ -65,7 +65,7 @@ while true; do
         2)
             # Redémarrer l'ordinateur
             echo "Redémarrage en cours..."
-            if ssh $nomssh@$addressip "sudo reboot"; then
+            if ssh $nomssh@$addressip "reboot"; then
                 log_action "Redémarrage de l'ordinateur"
             else
                 echo "Erreur de connexion ou d'exécution de la commande 'reboot'."
@@ -83,11 +83,11 @@ while true; do
                 echo "Session verrouillée avec gnome-screensaver-command"
                 exit 0
             elif command -v loginctl &>/dev/null; then
-                sudo loginctl lock-session
+                loginctl lock-session
                 echo "Session verrouillée avec loginctl"
                 exit 0
             elif command -v xtrlock &>/dev/null; then
-                sudo xtrlock
+                 xtrlock
                 echo "Session verrouillée avec xtrlock"
                 exit 0
             else
