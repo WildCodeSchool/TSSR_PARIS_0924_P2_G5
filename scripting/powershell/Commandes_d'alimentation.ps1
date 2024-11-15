@@ -1,25 +1,38 @@
 # --- Script de gestion des commandes d'alimentation en PowerShell ---
 
+# Demander les informations de connexion
+$sshname = Read-Host "Donner le nom du client"
+$sship = Read-Host "Donner l'adresse IP du client"
+$LOG_DATE = Get-Date -Format "yyyy-MM-dd"
+$LOG_FILE = "C:\Users\Wilder\Documents\log_evt_$LOG_DATE.log"  # Chemin du fichier log avec la date dans le nom
 
-$filePath =  ".\commande_dalimentation.txt"
-$date = Get-Date
+# Récupérer la date actuelle
+$date = Get-Date -Format "yyyy-MM-dd HH:mm:ss"  # Date et heure actuelles pour les entrées de log
 
 # Fonction pour créer un fichier log
-function Create-File {
-    param (
-        [string]$filePath
-    )
-
-    if (-not (Test-Path -Path $filePath)) {
-    New-Item -ItemType File -Path $filePath -Force | Out-Null
-        Write-Output "Fichier '$filePath' créé avec succès."
-        # Ajout d'un message de création dans le fichier
-        Add-Content -Path $filePath -Value "$date - Fichier créé"
+function Create-LogFile {
+    # Vérifie si le fichier log existe
+    if (-not (Test-Path $LOG_FILE)) {
+        # Crée le fichier log
+        New-Item -Path $LOG_FILE -ItemType File
+        Write-Host "Fichier '$LOG_FILE' créé avec succès."
+        # Ajouter une entrée pour signaler la création du fichier
+        Add-Content -Path $LOG_FILE -Value "$date - Fichier créé"
     } else {
-        Write-Output "Le fichier '$filePath' existe déjà." > $null
+        Write-Host "Le fichier '$LOG_FILE' existe déjà."
     }
 }
 
+# Fonction pour enregistrer l'action dans le fichier log
+function Log-Action {
+    param (
+        [string]$action
+    )
+    Add-Content -Path $LOG_FILE -Value "$date - $action"
+}
+
+# Appel de la fonction pour créer le fichier log
+Create-LogFile
 
 while ($true) {
     # Affichage du menu
@@ -37,8 +50,8 @@ while ($true) {
             # Arrêter l'ordinateur
             Write-Host "Arrêt en cours..."
             Stop-Computer -Force
-             # Ajouter une entrée dans le fichier log sans écraser son contenu
-            Add-Content -Path $filePath -Value "$date - L'ordinateur à été arrété."
+            # Ajouter une entrée dans le fichier log sans écraser son contenu
+            Log-Action "L'ordinateur a été arrêté."
             break
         }
         
@@ -47,7 +60,7 @@ while ($true) {
             Write-Host "Redémarrage en cours..."
             Restart-Computer -Force
             # Ajouter une entrée dans le fichier log sans écraser son contenu
-            Add-Content -Path $filePath -Value "$date - L'ordinateur à été redemmaré."
+            Log-Action "L'ordinateur a été redémarré."
             break
         }
         
@@ -57,7 +70,7 @@ while ($true) {
             # Utilisation de la commande de verrouillage pour Windows
             rundll32.exe user32.dll,LockWorkStation
             # Ajouter une entrée dans le fichier log sans écraser son contenu
-            Add-Content -Path $filePath -Value "$date - L'ordinateur à été verrouillé."
+            Log-Action "L'ordinateur a été verrouillé."
         }
         
         4 {
