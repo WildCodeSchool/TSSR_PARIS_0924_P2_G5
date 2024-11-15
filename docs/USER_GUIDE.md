@@ -1,6 +1,24 @@
 
 # Guide Utilisateur pour le Script d'Automatisation des Tâches
 
+- [Guide Utilisateur pour le Script d'Automatisation des Tâches](#guide-utilisateur-pour-le-script-dautomatisation-des-tâches)
+  - [Introduction](#introduction)
+  - [Prérequis](#prérequis)
+  - [Démarrer le Script](#démarrer-le-script)
+- [MENU PRINCIPAL](#menu-principal)
+  - [Connexion SSH/winRM](#connexion-sshwinrm)
+  - [Actions sur les Utilisateurs/Ordinateurs](#actions-sur-les-utilisateursordinateurs)
+    - [Utilisateur](#utilisateur)
+    - [Ordinateur Client](#ordinateur-client)
+  - [Informations sur les Utilisateurs/Ordinateurs](#informations-sur-les-utilisateursordinateurs)
+    - [Utilisateur](#utilisateur-1)
+    - [Ordinateur Client](#ordinateur-client-1)
+  - [Journalisation des Requêtes](#journalisation-des-requêtes)
+  - [Retour à l'Étape Précédente](#retour-à-létape-précédente)
+  - [Quitter le Script](#quitter-le-script)
+  - [Continuer ou Quitter](#continuer-ou-quitter)
+  - [FAQ](#faq)
+
 ## Introduction
 Ces script Bash et powershell permettent d'automatiser diverses tâches d'administration sur un serveur Debian en se connectant à un client Ubuntu ou sur un serveur windows server 2022 en se connectant à un client windows 10. Vous pouvez effectuer des actions sur les utilisateurs et les ordinateurs, récupérer des informations sur ces éléments, ainsi que consulter la journalisation des requêtes effectuées.
 
