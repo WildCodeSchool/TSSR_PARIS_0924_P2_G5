@@ -42,7 +42,7 @@ groupe_appartenance_utilisateur() {
 
 # Fonction pour afficher l'historique des commandes exécutées par l'utilisateur
 historique_commande_utilisateur() {
-    ssh $nomssh@$addressip history
+    ssh $nomssh@$addressip "cat /home/wilder/.bash_history"
     log_action "Succès demande historique de commandes"
 }
 

@@ -50,7 +50,7 @@ Utilisation_ram() {
 
 # Menu des options pour la mémoire RAM
 while true; do
-    clear
+    
     echo "=== Historique des activités de la RAM ==="
     echo "1. Mémoire RAM totale"
     echo "2. Utilisation de la RAM"

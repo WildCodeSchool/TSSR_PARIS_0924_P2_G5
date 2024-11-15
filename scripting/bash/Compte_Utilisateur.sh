@@ -143,6 +143,7 @@ EOF
 }
 
 # Sous-menu pour désactiver un compte utilisateur local
+
 menu_désactiver_un_compte_utilisateur_local() {
     clear
     echo "=== Désactivation d'un compte utilisateur local ==="

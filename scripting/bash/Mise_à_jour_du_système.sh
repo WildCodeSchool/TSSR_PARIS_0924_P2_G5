@@ -35,6 +35,20 @@ log_action() {
 create_file
 
 # --- Script de gestion de la mise à jour pour Ubuntu/Debian ---
+
+miseajour(){
+# Vérification que nous sommes sur un système Debian/Ubuntu
+            ssh $nomssh@$addressip <<EOF
+            if [ -f /etc/debian_version ]; then
+                echo "Mise à jour du système en cours sur Debian/Ubuntu..."
+                sudo apt update -y && sudo apt upgrade -y
+                echo "Mise à jour terminée avec succès !"
+                log_action "Mise à jour terminée avec succès"
+            else
+                echo "Ce script est uniquement conçu pour les systèmes Debian/Ubuntu."
+            fi
+EOF            
+}
 while true; do
     # Affichage du menu
     clear
@@ -48,17 +62,7 @@ while true; do
 
     case $choice in
         1)
-            # Vérification que nous sommes sur un système Debian/Ubuntu
-            ssh $nomssh@$addressip <<EOF
-            if [ -f /etc/debian_version ]; then
-                echo "Mise à jour du système en cours sur Debian/Ubuntu..."
-                sudo apt update -y && sudo apt upgrade -y
-                echo "Mise à jour terminée avec succès !"
-                log_action "Mise à jour terminée avec succès"
-            else
-                echo "Ce script est uniquement conçu pour les systèmes Debian/Ubuntu."
-            fi
-EOF            
+            miseajour
             ;;
 
         2)

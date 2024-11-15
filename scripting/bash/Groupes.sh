@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # Connexion via SSH
-read -p "Donner le nom du client : " sshname
-read -p "Donner l'adresse IP du client : " sship
+#read -p "Donner le nom du client : " sshname
+#read -p "Donner l'adresse IP du client : " sship
 
 nomssh=$sshname
 addressip=$sship
@@ -34,7 +34,7 @@ log_action() {
 # Appel de la fonction pour créer le fichier log
 create_file
 
-addadmin(){
+addadmin() {
  # --- Ajouter un utilisateur à un groupe d'administration ---
             echo "=== Ajouter un utilisateur à un groupe d'administration ==="
             read -p "Entrez le nom de l'utilisateur : " username
@@ -55,7 +55,7 @@ addadmin(){
 EOF            
 }
 
-addlocal(){
+addlocal() {
     # --- Ajouter un utilisateur à un groupe local ---
             echo "=== Ajouter un utilisateur à un groupe local ==="
             read -p "Entrez le nom de l'utilisateur : " username
@@ -75,7 +75,7 @@ addlocal(){
 EOF            
 }
 
-delete(){
+delete() {
     # --- Retirer un utilisateur d'un groupe ---
 echo "=== Retirer un utilisateur d'un groupe ==="
 read -p "Entrez le nom de l'utilisateur : " username
@@ -103,7 +103,9 @@ fi
 gpasswd -d "$username" "$group"
 echo "L'utilisateur $username a été retiré du groupe $group."
 log_action "L'utilisateur $username a été retiré du groupe $group"
+
 EOF
+
 }
 
 # --- Script avec Menu interactif pour gérer les utilisateurs et les groupes ---
@@ -122,16 +124,13 @@ while true; do
     read choice
 
     case $choice in
-        1)
-           addadmin
+        1) addadmin
             ;;
         
-        2)
-            addlocal
+        2) addlocal
             ;;
         
-        3)
-           delete 
+        3) delete 
             ;;
         
         4)
