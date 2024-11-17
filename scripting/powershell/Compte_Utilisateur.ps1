@@ -1,152 +1,167 @@
+# Demander l'IP ou le nom de la machine distante
+$remoteComputer = Read-Host "Veuillez entrer l'IP ou le nom de la machine distante"
+
+# Demander les informations d'identification une seule fois
+$credential = Get-Credential
+
+# Récupérer la date actuelle pour les logs
+$logDate = (Get-Date).ToString("yyyy-MM-dd")  # Formater la date pour le nom du fichier log
+$logFile = "C:\Users\wilder\Documents\log_evt_$logDate.log"  # Chemin du fichier log avec la date dans le nom
+$date = (Get-Date).ToString("yyyy-MM-dd HH:mm:ss")  # Date et heure actuelles pour les entrées de log
+
+
+# Fonction pour créer un fichier log
+function Create-LogFile {
+    # Vérifie si le répertoire existe
+    $logDir = [System.IO.Path]::GetDirectoryName($logFile)
+    if (-Not (Test-Path $logDir)) {
+        # Si le répertoire n'existe pas, le créer
+        New-Item -Path $logDir -ItemType Directory -Force
+        Write-Host "Répertoire '$logDir' créé avec succès."
+    }
+
+    # Vérifie si le fichier log existe
+    if (-Not (Test-Path $logFile)) {
+        # Si le fichier n'existe pas, le créer
+        New-Item -Path $logFile -ItemType File -Force
+        Write-Host "Fichier '$logFile' créé avec succès."
+    } else {
+        Write-Host "Le fichier '$logFile' existe déjà."
+    }
+}
+
+
+# Fonction pour enregistrer l'action dans le fichier log
+function Log-Action($message) {
+    $date = (Get-Date).ToString("yyyy-MM-dd HH:mm:ss")  # Met à jour la date pour chaque action
+    Add-Content -Path $logFile -Value "$date - $message"
+}
+
+
+# Créer le fichier log au début du script
+Create-LogFile
+
+# Fonction pour exécuter des commandes à distance
+function Execute-RemoteCommand {
+    param (
+        [string]$Command
+    )
+    # Utilisation de Invoke-Command avec un ScriptBlock
+    Invoke-Command -ComputerName $remoteComputer -Credential $credential -ScriptBlock {
+        param ($Command)
+        
+        # Vérification de la commande à exécuter
+        Invoke-Expression $Command
+    } -ArgumentList $Command
+}
+
+
+# Fonction de confirmation pour continuer
+function Ask-Continue {
+    $response = Read-Host "Appuyez sur Entrée pour revenir au menu principal..."
+    Main-Menu
+}
+
 # Fonction pour afficher le menu principal
-function Show-MainMenu {
-    Clear-Host
+function Main-Menu {
+    clear
     Write-Host "=== Menu Principal ==="
     Write-Host "1. Créer un compte utilisateur"
     Write-Host "2. Modifier le mot de passe d'un compte utilisateur"
     Write-Host "3. Supprimer un compte utilisateur"
     Write-Host "4. Désactiver un compte utilisateur"
     Write-Host "5. Quitter"
-    
     $choice = Read-Host "Choisissez une option"
 
     switch ($choice) {
-        1 { Create-UserAccount }
-        2 { Change-UserPassword }
-        3 { Remove-UserAccount }
-        4 { Disable-UserAccount }
-        5 { exit }
-        default { Write-Host "Choix invalide ! Veuillez réessayer." ; Show-MainMenu }
+        "1" { Menu-Creation-Compte-Utilisateur }
+        "2" { Menu-Modification-Mot-De-Passe }
+        "3" { Menu-Suppression-Compte-Utilisateur }
+        "4" { Menu-Désactiver-Compte-Utilisateur }
+        "5" { exit }
+        default { Write-Host "Choix invalide ! Veuillez réessayer." ; Main-Menu }
     }
 }
 
-$filePath =  ".\Compte_utilisateur.txt"
-$date = Get-Date
-
-# Fonction pour créer un fichier log
-function Create-File {
-    param (
-        [string]$filePath
-    )
-
-    if (-not (Test-Path -Path $filePath)) {
-        New-Item -ItemType File -Path $filePath -Force | Out-Null
-        Write-Output "Fichier '$filePath' créé avec succès."
-        # Ajout d'un message de création dans le fichier
-        Add-Content -Path $filePath -Value "$date - Fichier créé"
-    } else {
-        Write-Output "Le fichier '$filePath' existe déjà." > $null
-    }
-}
-
-
-# Fonction pour créer un compte utilisateur
-function Create-UserAccount {
+# Sous-menu pour la création d'un compte utilisateur
+function Menu-Creation-Compte-Utilisateur {
     Clear-Host
-    Write-Host "=== Création compte utilisateur ==="
-    $newUser = Read-Host "Donner un nom de compte à créer"
+    $newUser = Read-Host "Entrez le nom du compte à créer"
+    Log-Action "Début de la création de l'utilisateur $newUser sur $remoteComputer"
 
-    if (Get-LocalUser -Name $newUser -ErrorAction SilentlyContinue) {
-        Write-Host "L'utilisateur $newUser existe déjà. Sortie du script."
-        exit 1
-    } else {
-        Write-Host "Création de l'utilisateur $newUser"
-        New-LocalUser -Name $newUser -NoPassword
-        
-        if (Get-LocalUser -Name $newUser) {
-            Write-Host "Utilisateur $newUser créé !"
-            Add-Content -Path $filePath -Value "$date - utilisateur $newUser créé"
+    $command = @"
+        if (!(Get-LocalUser -Name "$newUser" -ErrorAction SilentlyContinue)) {
+            New-LocalUser -Name "$newUser" -NoPassword -FullName "$newUser"
+            "Utilisateur $newUser créé !"
         } else {
-            Write-Host "Erreur : Utilisateur $newUser non créé."
-            Add-Content -Path $filePath -Value "$date - erreur $newUser non créé"
+            "L'utilisateur $newUser existe déjà."
         }
-    }
-    Read-Host "Appuyez sur Entrée pour revenir au menu principal..."
-    Show-MainMenu
+"@
+    $output = Execute-RemoteCommand -Command $command
+    Write-Host $output
+    Log-Action "Fin de la création de l'utilisateur $newUser sur $remoteComputer"
+
+    Ask-Continue
 }
 
-# Fonction pour modifier le mot de passe d'un utilisateur
-function Change-UserPassword {
+# Sous-menu pour la modification du mot de passe d'un utilisateur
+function Menu-Modification-Mot-De-Passe {
     Clear-Host
-    Write-Host "Modification du mot de passe du compte utilisateur"
-    
-    $mdp = Read-Host -AsSecureString "Nouveau mot de passe"
-    
-    if (-not $mdp) {
-        Write-Host "Le mot de passe ne peut pas être vide."
-        exit 1
-    }
+    $userName = Read-Host "Entrez le nom de l'utilisateur"
+    $newPassword = Read-Host "Entrez le nouveau mot de passe" -AsSecureString
+    $command = @"
+        Set-LocalUser -Name '$userName' -Password (ConvertTo-SecureString '$newPassword' -AsPlainText -Force)
+        'Mot de passe de $userName modifié avec succès'
+"@
+    $output = Execute-RemoteCommand -Command $command
+    Write-Host $output
+    Log-Action "Mot de passe de $userName modifié"
 
-    $mdp2 = Read-Host -AsSecureString "Retapez le mot de passe (vérification)"
-
-    # Convertir les chaînes sécurisées en texte clair pour la comparaison
-    $mdpPlain = [Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.InteropServices.Marshal]::SecureStringToBSTR($mdp))
-    $mdp2Plain = [Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.InteropServices.Marshal]::SecureStringToBSTR($mdp2))
-
-    if ($mdpPlain -ne $mdp2Plain) {
-        Write-Host "Les mots de passe saisis ne correspondent pas."
-        exit 1
-    }
-
-    $username = Read-Host "Entrez le nom d'utilisateur pour modifier le mot de passe"
-    Set-LocalUser -Name $username -Password $mdp
-    Write-Host "Modification du mot de passe avec succès."
-    Add-Content -Path $filePath -Value "$date - mot de passe de $username modifié"
-    Read-Host "Appuyez sur Entrée pour revenir au menu principal..."
-    Show-MainMenu
+    Ask-Continue
 }
 
-# Fonction pour supprimer un compte utilisateur
-function Remove-UserAccount {
+# Sous-menu pour la suppression d'un compte utilisateur
+function Menu-Suppression-Compte-Utilisateur {
     Clear-Host
-    Write-Host "=== Suppression d'un compte utilisateur ==="
-    $delUser = Read-Host "Donner un nom de compte utilisateur à supprimer"
+    $delUser = Read-Host "Entrez le nom de l'utilisateur à supprimer"
+    Log-Action "Début de la suppression de l'utilisateur $delUser sur $remoteComputer"
 
-    if (Get-LocalUser -Name $delUser -ErrorAction SilentlyContinue) {
-        Write-Host "L'utilisateur $delUser existe. Suppression en cours..."
-        Remove-LocalUser -Name $delUser
-        
-        if (-not (Get-LocalUser -Name $delUser -ErrorAction SilentlyContinue)) {
-            Write-Host "Utilisateur $delUser supprimé."
-            Add-Content -Path $filePath -Value "$date - Utilisateur $delUser supprimé"
+    $command = @"
+        if (Get-LocalUser -Name "$delUser" -ErrorAction SilentlyContinue) {
+            Remove-LocalUser -Name "$delUser"
+            "Utilisateur $delUser supprimé avec succès."
         } else {
-            Write-Host "! Erreur : Utilisateur $delUser non supprimé."
-            Add-Content -Path $filePath -Value "$date - erreur $delUser non supprimé"
+            "L'utilisateur $delUser n'existe pas."
         }
-    } else {
-        Write-Host "Utilisateur $delUser non existant."
-        exit 1
-    }
+"@
+    $output = Execute-RemoteCommand -Command $command
+    Write-Host $output
+    Log-Action "Fin de la suppression de l'utilisateur $delUser sur $remoteComputer"
 
-    Read-Host "Appuyez sur Entrée pour revenir au menu principal..."
-    Show-MainMenu
+    Ask-Continue
 }
 
-# Fonction pour désactiver un compte utilisateur
-function Disable-UserAccount {
+
+# Sous-menu pour désactiver un compte utilisateur local
+function Menu-Désactiver-Compte-Utilisateur {
     Clear-Host
-    Write-Host "=== Désactivation d'un compte utilisateur ==="
-    $userToDisable = Read-Host "Donner un nom de compte utilisateur à désactiver"
+    $userToDisable = Read-Host "Entrez le nom de l'utilisateur à désactiver"
+    Log-Action "Début de la désactivation de l'utilisateur $userToDisable sur $remoteComputer"
 
-    if (Get-LocalUser -Name $userToDisable -ErrorAction SilentlyContinue) {
-        Write-Host "L'utilisateur $userToDisable existe. Désactivation en cours..."
-        Disable-LocalUser -Name $userToDisable
-        
-        if (-not (Get-LocalUser -Name $userToDisable -ErrorAction SilentlyContinue).Enabled) {
-            Write-Host "Utilisateur $userToDisable désactivé."
-            Add-Content -Path $filePath -Value "$date - utilisateur $userToDisable désactivé"
+    $command = @"
+        if (Get-LocalUser -Name "$userToDisable" -ErrorAction SilentlyContinue) {
+            Disable-LocalUser -Name "$userToDisable"
+            "Utilisateur $userToDisable désactivé avec succès."
         } else {
-            Write-Host "! Erreur : Utilisateur $userToDisable non désactivé."
-            Add-Content -Path $filePath -Value "$date - Erreur utilisateur $userToDisable non désactivé."
+            "L'utilisateur $userToDisable n'existe pas."
         }
-    } else {
-        Write-Host "Utilisateur $userToDisable non existant."
-        exit 1
-    }
+"@
+    $output = Execute-RemoteCommand -Command $command
+    Write-Host $output
+    Log-Action "Fin de la désactivation de l'utilisateur $userToDisable sur $remoteComputer"
 
-    Read-Host "Appuyez sur Entrée pour revenir au menu principal..."
-    Show-MainMenu
+    Ask-Continue
 }
 
 # Lancer le menu principal
-Show-MainMenu
+Main-Menu
